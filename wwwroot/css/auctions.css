@@ -1,0 +1,277 @@
+﻿/*
+    <body>
+      <body-wrapper>
+        <content-wrapper>
+          <content-list>
+          </content-list>
+          <content-table>
+          </content-table>
+        </content-wrapper>
+      </body-wrapper>
+    </body>
+*/
+
+:root {
+    --active-color: rgb(43, 0, 0); 
+}
+
+
+body {
+    margin: 0 auto; 
+}
+
+#body-wrapper {
+    padding: 10px;
+    margin: 0;
+    height: 700px;
+}
+
+#top-wrapper {
+    margin-bottom: 10px !important;
+}
+
+#top-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: flex-end;
+    margin-bottom: inherit;
+}
+
+#top-slider {
+    width: 35%;
+    max-width: 35%;
+}
+
+.irs-handle {
+    transform: scale(0.65); 
+}
+
+
+#top-search {
+    height: 100%;
+    border-bottom: 1px ridge black;
+    border-left: 0.5px ridge black;
+    padding: 5px;
+}
+
+#top-search .row:first-of-type {
+    margin-bottom: 7.5px;
+}
+
+#search {
+    width: 130%;
+    height: 32.5px; 
+    line-height: 0; 
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+}
+
+#top-search > .container > .row button[type="submit"] {
+    height: 32.5px; 
+    line-height: 0;
+    position: relative; 
+    left: -7.5px;
+}
+
+#content-wrapper {
+    background-color: #000;
+    background: rgba(0, 0, 0, 0.9);
+    height: 500px;
+    margin: 0 auto;
+    border: 4px solid black;
+    border-radius: 3px;
+}
+
+#content-list {
+    background-color: transparent;
+    width: 26%;
+    float: left;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+
+#content-list > .list-group {
+    background-color: inherit;
+}
+
+    /* all of the list-item */
+    #content-list .list-group-item-action {
+        font-size: 0.95em;
+        background-color: inherit;
+        border: 3px solid;
+        border-color: var(--active-color); 
+        color: white;
+    }
+
+    #content-list > .list-group .list-group-item {
+        border-bottom: 3px solid;
+        border-color: var(--active-color);
+    }
+
+#content-list .list-group-nested {
+    display: none;
+    margin-left: 25px;
+    border-left: 3px solid;
+    border-color: var(--active-color);
+}
+
+    #content-list .list-group-nested .list-group-item {
+        border-top: none;
+    }
+
+    #content-list .list-group-nested .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    #content-list > .list-group:last-child > .list-group-nested:last-child .list-group-item:last-child {
+        border-bottom: 3px solid;
+        border-color: var(--active-color);
+    }
+
+
+
+.active {
+    background-color: var(--active-color) !important;
+    border-color: var(--active-color);
+}
+
+#content-list .list-group-item-action:hover, #content.list .list-group-item-action:active {
+   /* background-color: $.active.color */
+}
+
+    #content-list .list-group-item > .float-left {
+        position: relative; 
+        left: -10px; 
+        top: 2px;  
+    }
+
+    #content-list .list-group-item > .float-right {
+        position: relative; 
+        right: -11px; 
+    }
+
+
+#content-table {
+    background-color: transparent;
+    height: 100%;
+    width: 74%;
+    float: right;
+    overflow-y: scroll; 
+    overflow-x: scroll; 
+}
+
+    #content-table > table {
+        border-collapse: collapse; 
+        width: 100%;
+        background-color: inherit;
+    }
+
+        #content-table > table > thead {
+            background-color: rgb(43, 1, 18);
+        }
+
+            #content-table > table > thead > tr > th {
+                border-color: rgb(43, 1, 18);
+            }
+
+    #content-table > table > thead > tr > th > a {
+        color: white; 
+        font-size: 0.95em; 
+    }
+
+    #content-table > table > tbody > tr {
+
+    }
+
+    #content-table > table > tbody > tr > td {
+        color: white;
+        cursor: pointer; 
+        font-size: 0.95em; 
+    }
+
+    #content-table .table-active {
+        background-color: var(--active-color);
+    }
+
+
+#bottom-wrapper {
+    margin-top: 10px;
+    background-color: #000;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid black;
+    border-radius: 3px;
+}
+
+#bottom-content {
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 5px;
+}
+
+#bottom-content > input {
+    margin-right: 5px; 
+    height: 32.5px; 
+    line-height: 0; 
+}
+
+#bottom-content > input[type="number"] {
+    width: 90px; 
+    text-align: center; 
+    background-color: transparent;
+    color: lightgreen;
+    border-color: lightgreen;
+}
+
+#bottom-content > input[value="Buy"] {
+    margin-right: 0; 
+}
+
+#bottom-content > input[type="button"] {
+    width: 65px; 
+}
+
+
+
+.slidecontainer {
+    width: 100%; /* Width of the outside container */
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+    cursor: pointer; 
+}
+
+
+.list-group-item .sv-inline--fa {
+    margin-right: 5px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #000000;
+}

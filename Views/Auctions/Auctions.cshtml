@@ -1,0 +1,204 @@
+﻿@model IEnumerable<AuctionCore.Models.AuctionModel.Auction>
+
+@inject AuctionCore.BLL.Services.SessionService SessionService
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@using static AuctionCore.Utils.StringExtensions; 
+
+@{
+    ViewData["Title"] = "Auctions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string categoryValue = ViewContext.HttpContext.Request.Query["category"].ToString().ToLower();
+    string searchValue = ViewContext.HttpContext.Request.Query["search"].ToString();
+    string orderByValue = ViewContext.HttpContext.Request.Query["orderBy"].ToString();
+    List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails> categories =
+        (List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails>)ViewData["categories"];
+}
+
+<link rel="stylesheet" href="~/css/auctions.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap">
+<link rel="stylesheet" href="~/css/slider-button.css" />
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/auctions.js"></script>
+<script src="~/js/ajax.js"></script>
+
+
+<div id="body-wrapper">
+
+    @Html.AntiForgeryToken()
+    <input type="button" id="sessionBtn" hidden />
+
+    <div id="top-wrapper">
+
+        <label class="switch">
+            <input type="checkbox" />
+            <span class="slider round"></span>
+        </label>
+
+        <div id="top-content">
+
+            <div id="top-slider">
+                <input id="range" type="text" name="range" value="" />
+                <p id="priceRangeSelected"></p>
+            </div>
+
+            @using (Html.BeginForm("Auctions", "Auctions", FormMethod.Get))
+            {
+        <div id="top-search">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <input type="text" name="category" id="category" hidden />
+                        <input type="text" name="interval" id="interval" hidden />
+                        <input type="text" placeholder="Search" aria-label="Search" name="search" id="search" class="form-control" />
+                    </div>
+
+                    <div class="col-lg-2 float-right">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                            <label class="form-check-label" for="inlineCheckbox1">Match</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                            <label class="form-check-label" for="inlineCheckbox2">Search</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
+                            <label class="form-check-label" for="inlineCheckbox3">Case-sens</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox4" value="option4">
+                            <label class="form-check-label" for="inlineCheckbox3">Something</label>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+
+        </div>   
+
+            }
+
+
+    </div> <!-- end of top-wrapper -->
+
+
+    <div id="content-wrapper">
+
+        <div id="content-list">
+
+            @foreach (var entry in categories)
+            {
+                <div class="list-group">
+
+                    <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@entry.Name.StripNonLatin().ToLower()">
+                        <span class="fa fa-chevron-right float-left"></span>
+                        @entry.Name <span class="badge badge-pill badge-primary float-right">@entry.GetCount()</span>
+                    </a>
+
+                    <div class="list-group list-group-flush list-group-nested">
+
+                        @foreach (var sub in entry.Subs)
+                        {
+                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(entry.Name.StripNonLatin(), ".", sub.Name.StripNonLatin()).ToLower()">
+                                @sub.Name <span class="badge badge-pill badge-primary float-right">@sub.Count</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <script>
+            var session =
+            @Json.Serialize(SessionService.Get(HttpContextAccessor.HttpContext.Request.Cookies["session:id"].ToString()));
+        </script>
+
+        <div id="content-table">
+
+            @if (Model != null)
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("name", orderByValue == "name" || orderByValue == "name.asc" ? ".desc" : ".asc")">
+                                    Name
+                                </a>
+                            </th>
+                            <th scope="col" class="noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("expires", orderByValue == "expires" || orderByValue == "expires.asc" ? ".desc" : ".asc")">
+                                    Expires
+                                </a>
+                            </th>
+                            <th scope="col" class="init noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("startingprice", orderByValue == "startingprice" || orderByValue == "startingprice.asc" ? ".desc" : ".asc")">
+                                    Starting Price
+                                </a>
+                            </th>
+                            <th scope="col" class="min noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("currentbid", orderByValue == "currentbid" || orderByValue == "currentbid.asc" ? ".desc" : ".asc")">
+                                    Current Bid
+                                </a>
+                            </th>
+                            <th scope="col" class="max noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("buyoutprice", orderByValue == "buyoutprice" || orderByValue == "buyoutprice.asc" ? ".desc" : ".asc")">
+                                    Buyout Price
+                                </a>
+                            </th>
+                            <th scope="col" class="noselect">
+                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("soldby", orderByValue == "soldby" || orderByValue == "soldby.asc" ? ".desc" : ".asc")">
+                                    Sold By
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var auction in Model)
+                        {
+                            <tr id="@auction.Id" class="noselect">
+                                <td>@auction.Item.Name</td>
+                                <td>@auction.Expires.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="init">@string.Concat(auction.StartingPrice, " " + auction.Currency)</td>
+                                <td class="min">@string.Concat(auction.Bids.Max(bid => (decimal?)bid.Amount), auction.Bids.Any() ? " " + auction.Currency : "")</td>
+                                <td class="max">@string.Concat(auction.BuyoutPrice, auction.BuyoutPrice != null ? " " + auction.Currency : "")</td>
+                                <td>@auction.Auctioneer</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div> <!-- end of content-table -->
+    </div> <!-- end of content-wrapper -->
+
+    <div id="bottom-wrapper">
+        <div id="bottom-content">
+            <input type="number" value="0.0" class="form-control" />
+            <input type="button" value="Bid" class="btn btn-primary" />
+            <input type="button" value="Buy" class="btn btn-secondary" />
+        </div> <!-- end of bottom-content -->
+    </div> <!-- end of bottom-wrapper -->
+
+</div> <!-- end of body-wrapper -->

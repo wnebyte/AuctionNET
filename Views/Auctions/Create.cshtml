@@ -1,0 +1,72 @@
+﻿@model AuctionCore.Models.AuctionModel.Auction
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails> categories =
+        (List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails>)ViewData["categories"];
+}
+
+<h1>Create</h1>
+
+<h4>Auction</h4>    
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <div class="row" lang="sv">
+                    <select id="category" name="category" style="width: 250px;">
+                        @foreach (var entry in categories)
+                        {
+                            @foreach (var sub in entry.Subs)
+                            {
+                                <option value="@string.Concat(entry.Name, ".", sub.Name)">@string.Concat(entry.Name, ".", sub.Name)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartingPrice" class="control-label"></label>
+                <input asp-for="StartingPrice" class="form-control" />
+                <span asp-validation-for="StartingPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BuyoutPrice" class="control-label"></label>
+                <input asp-for="BuyoutPrice" class="form-control" />
+                <span asp-validation-for="BuyoutPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Posted" class="control-label"></label>
+                <input asp-for="Posted" class="form-control" />
+                <span asp-validation-for="Posted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Expires" class="control-label"></label>
+                <input asp-for="Expires" class="form-control" />
+                <span asp-validation-for="Expires" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Auctioneer" class="control-label"></label>
+                <input asp-for="Auctioneer" class="form-control" />
+                <span asp-validation-for="Auctioneer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SchemaVersion" class="control-label"></label>
+                <input asp-for="SchemaVersion" class="form-control" />
+                <span asp-validation-for="SchemaVersion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

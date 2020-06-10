@@ -1,0 +1,113 @@
+﻿@model AuctionCore.Models.UserLogin;
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AuctionCore</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Auctions" asp-action="Auctions">Auctions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </li>
+
+                <li>
+
+                    <button type="button" class="btn btn-info" id="modalBtn"
+                            style="position: absolute; right: 20px;">
+                        User Profile
+                    </button>
+
+                    <div id="login-modal" class="modal hide" role="dialog">
+
+                        <div class="modal-dialog">
+
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="close float-right modal-close">&times;</button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div id="login-wrapper">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <form method="post" class="form-login">
+                                                    <div asp-validation-summary="All" class="text-danger">
+                                                        <div class="form-group">
+                                                            <h4 class="modal-title text-center">Sign in</h4>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <input asp-for="EmailAddress" type="email" name="emailaddress" id="emailaddress" class="form-control" placeholder="Email address" required autofocus>
+                                                            <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <input asp-for="Password" type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Sign in</button>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <a href="#" style="padding-right: 10px;">Forgot Password?</a>
+                                                            <a href="#">Not Registered?</a>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="account-modal" class="modal hide" role="dialog">
+
+                        <div class="modal-dialog">
+
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="close float-right modal-close">&times;</button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div id="account-wrapper">
+
+                                        <div class="form-group">
+                                            <h4 class="modal-title text-center">Account</h4>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <p></p>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="form-group" style="margin: 0 auto;">
+                                                <button type="button" class="btn btn-primary">Settings</button>
+                                                <button id="logoutBtn" type="button" class="btn btn-danger">Logout</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
