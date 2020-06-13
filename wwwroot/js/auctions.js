@@ -31,6 +31,12 @@ $(function () {
         var node = $(this).blur();
 
         if (clicks == 1) {
+            if (node.parent().hasClass('list-group-nested')) {
+                click(node);
+                $('#sessionBtn').click();
+                clicks = 0;
+                return;
+            }
             timer = setTimeout(function () {
                 click(node);
                 $('#sessionBtn').click();
@@ -125,30 +131,47 @@ $(function () {
 
     var instance; 
     var disabled = true;
+    var values = [0, 50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, '&#8734;'];
+    var from = values.indexOf(50);
+    var to = values.indexOf(400);
+    var range = $('#range');
 
-    $("#range").ionRangeSlider({
-        type: "double",
-        skin: "big", 
-        grid: true,
-        min: 0,
-        max: 1000,
-        from: 200,
-        to: 800,
-        prefix: "$",
-        disable: disabled,
-        force_edges: true,
-        onChange: function (data) {
-            $('#interval').html(data.from + ', ' + data.to);
+    $('#range-slider').ionRangeSlider({
+        type: 'double', 
+        skin: 'big', 
+        grid: true, 
+        from: from, 
+        to: to, 
+        values: values, 
+        disable: disabled, 
+        prettify_enabled: true, 
+        prettify_separator: ',', 
+        postfix: ' SEK', 
+        force_edges: true, 
+        onFinish: function (data) {
+            range.val(values[data.from] + "," + values[data.to]);
+        }, 
+        onUpdate: function (data) {
+            if (disabled)
+                range.val(null);
+            else
+                range.val(values[data.from] + "," + values[data.to]);
         }
     });
 
     $('.slider').click(function () {
-        instance = $('#range').data('ionRangeSlider'); 
-        instance.update({
-            disable: !disabled
-        });
+        instance = $('#range-slider').data('ionRangeSlider'); 
         disabled = !disabled;
+        instance.update({
+            disable: disabled
+        });
+
+        $('#range-selector input[type="radio"]').attr('disabled', disabled)
+            .siblings('label').toggleClass('opacity');
     });
+
+    $('#auctions-modal').show();
+
 });
 
 // #content-list click event

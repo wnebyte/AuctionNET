@@ -40,6 +40,7 @@
                                     <div id="login-wrapper">
                                         <div class="row">
                                             <div class="col-md-12">
+                                                @Html.AntiForgeryToken()
                                                 <form method="post" class="form-login">
                                                     <div asp-validation-summary="All" class="text-danger">
                                                         <div class="form-group">

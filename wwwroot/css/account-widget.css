@@ -1,23 +1,23 @@
-﻿.modal-backdrop {
+﻿nav .modal-backdrop {
     opacity: 0.0 !important;  
 }
 
-.modal-dialog {
+nav .modal-dialog {
     position: fixed;
     top: 20px; 
     right: 17.5px; 
     z-index: 10040; 
 }
 
-.modal-header {
+nav .modal-header {
     padding: 0.1rem; 
     border: none; 
 }
 
-.modal-body {
+nav .modal-body {
     margin: 0 auto; 
 }
 
-.modal-body > .row {
+nav .modal-body > .row {
     margin: inherit; 
 }
