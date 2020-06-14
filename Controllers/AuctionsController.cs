@@ -9,7 +9,9 @@ using AuctionCore.Models;
 using AuctionCore.BLL.Services;
 using AuctionCore.BLL.Queries;
 using AuctionCore.Utils;
-using AuctionCore.BLL.Validation; 
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace AuctionCore.Controllers
 {
@@ -93,6 +95,30 @@ namespace AuctionCore.Controllers
             }
 
             return View(auction);
+        }
+
+        [HttpGet]
+        public IActionResult Upload()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Upload(IFormFile file)
+        {
+            var binaryReader = new BinaryReader(file.OpenReadStream());
+            byte[] fileData = binaryReader.ReadBytes((int)file.Length);
+
+            Auction auction = _auctions.Get().FirstOrDefault();
+            auction.Item.Images.Add(new Image
+            {
+                Bytes = fileData, 
+                Size = fileData.Length, 
+                ContentType = file.ContentType
+            });
+
+            _auctions.Update(auction.Id, auction);
+            return Ok();
         }
     }
 }

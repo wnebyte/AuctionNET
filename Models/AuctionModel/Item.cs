@@ -27,5 +27,9 @@ namespace AuctionCore.Models.AuctionModel
         [BsonRequired]
         [BsonElement(elementName: "keywords")]
         public List<string> Keywords { get; set; } = new List<string>();
+
+        [BsonIgnoreIfDefault]
+        [BsonElement(elementName: "images")]
+        public List<Image> Images { get; set; } = new List<Image>();
     }
 }

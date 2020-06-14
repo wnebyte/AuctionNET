@@ -299,24 +299,31 @@ body {
         border: 2px solid var(--secondary-color);
         border-radius: 3px;
         margin: 10px;
-        padding: 5px;
-        text-align: center;
         color: white;
+        display: table;
     }
 
     #modal-body-wrapper .modal-flex-content:first-child {
-        flex-basis: 200px;
+        height: 200px;
         width: 350px;
     }
 
     #modal-body-wrapper .modal-flex-content:nth-child(2) {
         width: 200px;
+        height: 55px;
     }
 
     #modal-body-wrapper .modal-flex-content:last-child {
         width: 250px;
         height: 100px;
     }
+
+        #modal-body-wrapper .modal-flex-content p {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+        }
+    
 
 #bottom-wrapper {
     margin-top: 10px;

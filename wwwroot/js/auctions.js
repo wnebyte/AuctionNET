@@ -4,7 +4,7 @@ let state = {
     "selected": ""
 };
 
-var DELAY = 225, clicks = 0, timer = null;
+var DELAY = 225, clicks = 0, timer_list = null, timer_table = null;
 const WAIT = 750;
 
 const trActive  = 'table-active';
@@ -26,26 +26,26 @@ $(function () {
     });
 
     // init #content-list
-    $('.list-group-item-action').on('click', function (evt) {
+    $('.list-group-item-action').on('click', function () {
         clicks++;
         var node = $(this).blur();
 
         if (clicks == 1) {
             if (node.parent().hasClass('list-group-nested')) {
-                click(node);
+                click_list(node);
                 $('#sessionBtn').click();
                 clicks = 0;
                 return;
             }
-            timer = setTimeout(function () {
-                click(node);
+            timer_list = setTimeout(function () {
+                click_list(node);
                 $('#sessionBtn').click();
                 clicks = 0;
             }, DELAY);
 
         } else {
-            clearTimeout(timer);
-            dblclick(node);
+            clearTimeout(timer_list);
+            dblclick_list(node);
             $('#sessionBtn').click();
             clicks = 0;
         }
@@ -57,7 +57,7 @@ $(function () {
     if (session != null) {
 
         if (session.Selected != null && session.Selected != '') {
-            click($('#' + session.Selected.replace(".", "\\.")));
+            click_list($('#' + session.Selected.replace(".", "\\.")));
         }
 
         if (session.Toggled != null) {
@@ -65,16 +65,31 @@ $(function () {
 
             for (i = 0; i < data.length; i++) {
                 if (data[i] != null && data[i] != '')
-                    dblclick($('#' + data[i]));
+                    dblclick_list($('#' + data[i]));
             }
         }
     }
 
     // init #content-table
-    $('#content-table > table > tbody > tr').click(function () {
-        $('#content-table > table > tbody > tr').not($(this)).removeClass(trActive);
-        $(this).toggleClass(trActive);
-    });
+    $('#content-table > table > tbody > tr').on('click', function () {
+        clicks++;
+        var node = $(this); 
+
+        if (clicks == 1) {
+            timer_table = setTimeout(function () {
+                click_table(node);
+                clicks = 0;
+            }, DELAY);
+        }
+        else {
+            clearTimeout(timer_table);
+            dblclick_table(node);
+            clicks = 0;
+        }
+    })
+        .on('dbclick', function (e) {
+            e.preventDefault();
+        });
 
     $('input[value="Bid"]').click(function () {
         var node = $('.' + trActive);
@@ -129,6 +144,7 @@ $(function () {
         $(this).blur();
     });
 
+    // init #range_slider
     var instance; 
     var disabled = true;
     var values = [0, 50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, '&#8734;'];
@@ -170,23 +186,20 @@ $(function () {
             .siblings('label').toggleClass('opacity');
     });
 
-    $('#auctions-modal').show();
-
 });
 
 // #content-list click event
-function click(node) {
+function click_list(node) {
     $('.list-group-item-action').not(node).removeClass('active');
     node.toggleClass('active');
     if (node.hasClass('active'))
         state.selected = $('#category').val(node.attr('id')).val();
     else
         state.selected = $('#category').val(null).val();
- 
 }
 
 // #content-list dblclick event
-function dblclick(node) {
+function dblclick_list(node) {
     if (node.hasClass('collapser')) {
         node.siblings('div > .list-group').slideToggle();
         $('.svg-inline--fa', node)
@@ -197,6 +210,26 @@ function dblclick(node) {
         else
             state.toggled.splice(state.toggled.indexOf(node.attr('id')), 1); 
     }
+}
+
+function click_table(node) {
+    $('#content-table > table > tbody > tr').not(node).removeClass(trActive);
+    node.toggleClass(trActive);
+}
+
+function dblclick_table(node) {
+    var modal = $('#auctions-modal');
+    var model = getModel(node.attr('id'));
+    var images = model.Item.Images;
+
+    if (images.length == 0)
+        buildDefaultCarousel();
+    else 
+        buildCustomCarousel(images);
+
+    $('#name', modal).html(model.Item.Name);
+    $('#description', modal).html(model.Item.Description);
+    modal.show();
 }
 
 // error handler for #content-table's buy/buyout buttons
@@ -307,4 +340,42 @@ function validates(bid) {
 
 function maxBid(data) {
     return Math.max.apply(Math, data.Bids.map(function (o) { return o.Amount; })) + ' ' + data.Currency;
+}
+
+function getModel(id) {
+    for (i = 0; i < model.length; i++) {
+        if (model[i].Id == id) {
+            return model[i];
+        }
+    }
+    return null;
+}
+
+function buildDefaultCarousel() {
+    var indicators = $('.carousel-indicators');
+    indicators.children('li').remove();
+    indiactors.append('<li data-target="#carousel" data-slide-to="0" class="active"></li>');
+
+    var inner = $('.carousel-inner');
+    inner.children('.carousel-item').remove();
+    inner.append('<div class="carousel-item active"><img class="d-block w-100" src="~/images/no-image.jpg" width="250" height="200" alt="First slide"/></div>');
+}
+
+function buildCustomCarousel(images) {
+    var indicators = $('.carousel-indicators');
+    indicators.children('li').remove();
+
+    var inner = $('.carousel-inner');
+    inner.children('.carousel-item').remove();
+
+    for (i = 0; i < images.length; i++) {
+        indicators
+            .append('<li data-target="#carousel" data-slide-to="' + i + '"></li>');
+        inner
+            .append('<div class="carousel-item">' +
+                '<img class="d-block w-100" src="data:' + images[i].ContentType + ';base64,' + images[i].Bytes + '" width="250" height="200"/>' +
+                '</div>');
+    }
+    indicators.children('li:first-of-type').addClass('active');
+    inner.children('.carousel-item:first-of-type').addClass('active');
 }
