@@ -6,67 +6,235 @@
 
     List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails> categories =
         (List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails>)ViewData["categories"];
+
+    List<AuctionCore.Models.AuctionModel.Auction> auctions =
+        (List<AuctionCore.Models.AuctionModel.Auction>)ViewData["auctions"];
+
+     string orderBy = ViewContext.HttpContext.Request.Query["orderBy"].ToString().ToLower();
+
+
 }
 
-<h1>Create</h1>
+<link rel="stylesheet" href="~/css/create.css" />
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/create.js"></script>
 
-<h4>Auction</h4>    
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <div class="row" lang="sv">
-                    <select id="category" name="category" style="width: 250px;">
-                        @foreach (var entry in categories)
-                        {
-                            @foreach (var sub in entry.Subs)
-                            {
-                                <option value="@string.Concat(entry.Name, ".", sub.Name)">@string.Concat(entry.Name, ".", sub.Name)</option>
-                            }
-                        }
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartingPrice" class="control-label"></label>
-                <input asp-for="StartingPrice" class="form-control" />
-                <span asp-validation-for="StartingPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BuyoutPrice" class="control-label"></label>
-                <input asp-for="BuyoutPrice" class="form-control" />
-                <span asp-validation-for="BuyoutPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Posted" class="control-label"></label>
-                <input asp-for="Posted" class="form-control" />
-                <span asp-validation-for="Posted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Expires" class="control-label"></label>
-                <input asp-for="Expires" class="form-control" />
-                <span asp-validation-for="Expires" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Auctioneer" class="control-label"></label>
-                <input asp-for="Auctioneer" class="form-control" />
-                <span asp-validation-for="Auctioneer" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SchemaVersion" class="control-label"></label>
-                <input asp-for="SchemaVersion" class="form-control" />
-                <span asp-validation-for="SchemaVersion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div id="body-wrapper">
+
+    <div id="top-wrapper">
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div id="content-wrapper">
 
+        <div id="content-create">
+            <div class="container">
+                @Html.AntiForgeryToken()
+                <form asp-action="Create" method="post" enctype="multipart/form-data" autocomplete="off" spellcheck="false">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row" style="margin-bottom: 7.5px;">
+                        <div class="col-md-12">
+                            <h4 class="text-center" style="color: white;">Create Auction</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="Item.Name">Auction's name<span class="text-warning"> *</span></label>
+                                <input asp-for="Item.Name" type="text" id="name" class="form-control" />
+                                <span asp-validation-for="Item.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="Item.Description">Auction's description<span class="text-warning"> *</span></label>
+                                <textarea asp-for="Item.Description" rows="8" id="textareaInput" class="form-control"></textarea>
+                                <span asp-validation-for="Item.Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="category">Auction's category<span class="text-warning"> *</span></label>
+                                <div class="flex-container" style="display: flex; flex-direction: row; align-items: center;">
+                                    <div style="margin-right: 5px;">
+                                        <input id="category" type="text" class="form-control noselect" disabled />
+                                        <input asp-for="Item.Category.Main" id="categoryMain" class="form-control" hidden />
+                                        <input asp-for="Item.Category.Sub" id="categorySub" class="form-control" hidden />
+                                    </div>
+                                    <div class="btn-group dropright">
+                                        <button id="categoryBtn" class="btn btn-primary dropdown-toggle dropdown-toggle-split" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="sr-only">Toggle Dropright</span>
+                                        </button>
+                                        <div id="category-dropdown-menu" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            @foreach (var cat in categories)
+                                            {
+                                                <div class="list-group">
+                                                    <a href="#!" class="list-group-item list-group-item-action collapser noselect">
+                                                        <span class="fa fa-chevron-down float-left"></span>
+                                                        @cat.Name
+                                                    </a>
+
+                                                    <div class="list-group list-group-flush list-group-nested">
+
+                                                        @foreach (var sub in cat.Subs)
+                                                        {
+                                                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(cat.Name, " | ", sub.Name)">
+                                                                @sub.Name
+                                                            </a>
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span asp-validation-for="Item.Category.Main" class="text-danger"></span>
+                                        <span asp-validation-for="Item.Category.Sub" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Auction's images</label>
+                                <input asp-for="Item.ImageFiles" type="file" multiple="multiple" class="form-control-file" />
+                                <span asp-validation-for="Item.ImageFiles" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Auction's currency<span class="text-warning"> *</span></label>
+                                <div class="flex-container" style="display: flex; flex-direction: row; align-items: center;">
+                                    <div class="btn-group dropup" style="margin-right: 5px;">
+                                        <button id="currencyBtn" type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <div id="currency-dropdown-menu" class="dropdown-menu">
+                                            <a href="#!" class="dropdown-item">SEK</a>
+                                            <a href="#!" class="dropdown-item">$USD</a>
+                                        </div>
+                                    </div>
+                                    <input asp-for="Currency" type="text" id="currency" class="form-control" />
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span asp-validation-for="Currency" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="StartingPrice">Auction's starting price<span class="text-warning"> *</span></label>
+                                <input asp-for="StartingPrice" type="number" id="startingPrice" class="form-control" />
+                                <span asp-validation-for="StartingPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="BuyoutPrice">Auction's buyout price</label>
+                                <input asp-for="BuyoutPrice" type="number" id="buyoutPrice" class="form-control" />
+                                <span asp-validation-for="BuyoutPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group" style="border: none;">
+                                <input type="submit" value="Submit" class="btn btn-primary btn-block text-uppercase" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="content-table">
+            @if (auctions.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="noselect">
+                                @Html.ActionLink("Name", "Create", new { orderBy = string.Concat("name", orderBy == "name" || orderBy == "name.asc" ? ".desc" : ".asc") })
+                            </th>
+                            <th scope="col" class="noselect">
+                                @Html.ActionLink("Expires", "Create", new { orderBy = string.Concat("expires", orderBy == "expires" || orderBy == "expires.asc" ? ".desc" : ".asc") })
+                            </th>
+                            <th scope="col" class="init noselect">
+                                @Html.ActionLink("Starting Price", "Create", new { orderBy = string.Concat("startingprice", orderBy == "startingprice" || orderBy == "startingprice.asc" ? ".desc" : ".asc") })
+                            </th>
+                            <th scope="col" class="min noselect">
+                                @Html.ActionLink("Current Bid", "Create", new { orderBy = string.Concat("currentbid", orderBy == "currentbid" || orderBy == "currentbid.asc" ? ".desc" : ".asc") })
+                            </th>
+                            <th scope="col" class="max noselect">
+                                @Html.ActionLink("Buyout Price", "Create", new { orderBy = string.Concat("buyoutprice", orderBy == "buyoutprice" || orderBy == "buyoutprice.asc" ? ".desc" : ".asc") })
+                            </th>
+                            <th scope="col" class="noselect">
+                                @Html.ActionLink("Sold By", "Create", new { orderBy = string.Concat("soldby", orderBy == "soldby" || orderBy == "soldby.asc" ? ".desc" : ".asc") })
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var auction in auctions)
+                        {
+                            <tr id="@auction.Id" class="noselect">
+                                <td>@auction.Item.Name</td>
+                                <td>@auction.Expires.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@string.Concat(auction.StartingPrice, " ", auction.Currency)</td>
+                                <td>@string.Concat(auction.Bids.Max(bid => (decimal?)bid.Amount), auction.Bids.Any() ? " " + auction.Currency : "")</td>
+                                <td>@string.Concat(auction.BuyoutPrice, auction.BuyoutPrice != null ? " " + auction.Currency : "")</td>
+                                <td>@auction.Auctioneer</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div id="model-empty">
+                    <h3 class="font-weight-bold">No Auctions Found!</h3>
+                </div>
+            }
+        </div>
+
+    </div> <!-- end of content wrapper -->
+
+    <div id="bottom-wrapper">
+        <div id="bottom-content">
+            <div class="bottom-flex-parent">
+                <input type="button" value="Auctions" class="btn btn-info" />
+                <input type="button" value="Create" class="btn btn-info" disabled />
+            </div>
+            <div class="bottom-flex-parent">
+                <input type="button" value="Delete" class="btn btn-danger btn-outline-dark" />
+                <input type="button" value="Update" class="btn btn-primary btn-outline-dark" />
+            </div>
+        </div> <!-- end of bottom-content -->
+    </div> <!-- end of bottom-wrapper -->
+</div> <!-- end of body wrapper -->

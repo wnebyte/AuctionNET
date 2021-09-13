@@ -21,28 +21,6 @@ namespace AuctionCore.Controllers
             return View();
         }
 
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Create(Auction auction)
-        {
-            if (ModelState.IsValid)
-            {
-                auction.Auctioneer = "wne";
-                auction.Expires = auction.Posted.AddDays(7);
-                service.Create(auction);
-                return RedirectToAction("Index");
-            }
-            return View(auction);
-        }
-
-   
-
         public IActionResult Privacy()
         {
             return View();

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuctionCore.Models.BankCardModel
+namespace AuctionCore.Models.Ajax
 {
-    public enum BankCardCompany
+    public class AsyncDelete
     {
-        MASTERCARD, 
-        VISA
+        public string Id { get; set; }
     }
 }

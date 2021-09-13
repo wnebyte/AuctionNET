@@ -21,3 +21,9 @@ nav .modal-body {
 nav .modal-body > .row {
     margin: inherit; 
 }
+
+#login-modal .modal-dialog, #account-modal .modal-dialog {
+    width: 290px;
+    height: 495px;
+    min-height: 495px;
+}

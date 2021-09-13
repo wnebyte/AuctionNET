@@ -33,7 +33,7 @@ namespace AuctionCore.DAL.Repositories
         public Auction Get(string id) =>
             _auctions.Find<Auction>(auction => auction.Id == id).FirstOrDefault();
 
-        public Auction Create(Auction auction)
+        public Auction Insert(Auction auction)
         {
             _auctions.InsertOne(auction);
             return auction;

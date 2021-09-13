@@ -1,77 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using AuctionCore.Models.AuctionModel;
-using AuctionCore.Models.CategoryDetailsModel;
-using AuctionCore.Models;
 using AuctionCore.BLL.Services;
-using AuctionCore.BLL.Queries;
 using AuctionCore.Utils;
+using AuctionCore.Utils.Extensions;
 using System.IO;
-using Microsoft.AspNetCore.Http;
-using System.Text;
 
 namespace AuctionCore.Controllers
 {
     public class AuctionsController : BaseController
     {
         private readonly AuctionService _auctions;
+        private readonly SessionService _sessions;
         private readonly CategoryDetailsService _categories;
 
         public AuctionsController()
         {
             _auctions = new AuctionService();
+            _sessions = new SessionService();
             _categories = new CategoryDetailsService();
         }
 
         [HttpGet("/Auctions")]
-        public IActionResult Auctions(string category, string search, string orderBy)
+        public IActionResult Auctions(string category, string range, string search, string orderBy)
         {
             List<Auction> auctions = _auctions.Get();
             ViewData["categories"] = _categories.Get();
 
             if (category != null)
             {
-                string[] categorySplit = category.Split(".");
+                string[] categories = category.ToLower().Split(".");
 
-                if (categorySplit.Length == 1)
+                if (categories.Length == 1)
                 {
-                    auctions = new List<Auction>(
-                        from auction in auctions
-                        where auction.Item.Category.Main.StripNonLatin().ToLower() == categorySplit[0].StripNonLatin().ToLower()
-                        select auction
-                        );
+                    auctions = auctions.FindAll(auc => auc.Item.Category.Main.ToLower().StripNonLatin() == categories[0]);
                 }
-                else if (categorySplit.Length == 2)
+                else if (categories.Length == 2)
                 {
-                    auctions = new List<Auction>(
-                        from auction in auctions
-                        where auction.Item.Category.Main.StripNonLatin().ToLower() == categorySplit[0].StripNonLatin().ToLower() &&
-                        auction.Item.Category.Sub.StripNonLatin().ToLower() == categorySplit[1].StripNonLatin().ToLower()
-                        select auction
-                        );
+                    auctions = auctions.FindAll(auc => auc.Item.Category.Main.ToLower().StripNonLatin() == categories[0] && 
+                    auc.Item.Category.Sub.ToLower().StripNonLatin() == categories[1]);
+                }
+            }
+
+            if (range != null)
+            {
+                string[] split = range.Split('-');
+
+                if (split.Length == 2 || split.Length == 3)
+                {
+                    split[split.Length - 1] = split[split.Length - 1] == "&#8734;" ? double.MaxValue.ToString() : split[split.Length - 1];
+
+                    if (double.TryParse(split.Length == 2 ? split[0] : split[1], out double lower) &&
+                        double.TryParse(split.Length == 2 ? split[1] : split[2], out double upper))
+                    {
+                        auctions = auctions.MyRange(lower, upper, split.Length == 2 ? "startingprice" : split[0]);
+                    }
                 }
             }
 
             if (search != null)
             {
-                auctions = new List<Auction>(
-                    from auction in auctions
-                    where auction.Item.Name.ToLower() == search.ToLower()
-                    select auction
-                    );
+                auctions = auctions.FindAll(auc => auc.Item.Name.ToLower() == search.ToLower());
             }
 
             if (orderBy != null)
             {
-                string[] orderBySplit = orderBy.Split(".");
-                bool asc = true;
-
-                if (orderBySplit.Length == 2 && orderBySplit[1].ToUpper() == "DESC") asc = false;
-
-                auctions = AuctionQueries.OrderBy(auctions, orderBySplit[0].ToLower(), asc);
+                string[] order = orderBy.ToLower().Split(".");
+                auctions = auctions.MyOrderBy(order[0], order.Length == 2 && order[1] == "desc" ? false : true);
             }
 
             return View(auctions);
@@ -79,46 +74,54 @@ namespace AuctionCore.Controllers
 
 
         [HttpGet("/Create")]
-        public IActionResult Create()
+        public IActionResult Create(string orderBy)
         {
-            ViewData["categories"] = _categories.Get();
-
-            return View();
-        }
-
-        [HttpPost("/Create")]
-        public IActionResult Create(Auction auction, string category)
-        {
-            if (ModelState.IsValid)
+            if (_sessions.Exists(this.HttpContext, "session:id", out var session) && session.Username != null)
             {
+                ViewData["categories"] = _categories.Get();
+                ViewData["auctions"]   = _auctions.Get().FindAll(auc => auc.Auctioneer == session.Username);
 
+                if (orderBy != null)
+                {
+                    string[] order = orderBy.ToLower().Split(".");
+                    bool asc = order.Length == 2 && order[1] == "desc" ? false : true;
+
+                    ViewData["auctions"] = ((List<Auction>)ViewData["auctions"]).MyOrderBy(order[0], asc);
+                }
+                return View();
             }
-
-            return View(auction);
+            return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
-        public IActionResult Upload()
+        [ValidateAntiForgeryToken]
+        [HttpPost("/Create")]
+        public IActionResult Create(Auction auction)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Upload(IFormFile file)
-        {
-            var binaryReader = new BinaryReader(file.OpenReadStream());
-            byte[] fileData = binaryReader.ReadBytes((int)file.Length);
-
-            Auction auction = _auctions.Get().FirstOrDefault();
-            auction.Item.Images.Add(new Image
+            if (_sessions.Exists(this.HttpContext, "session:id", out var session) && session.Username != null)
             {
-                Bytes = fileData, 
-                Size = fileData.Length, 
-                ContentType = file.ContentType
-            });
+                ViewData["categories"] = _categories.Get();
+                ViewData["auctions"]   = _auctions.Get().FindAll(auc => auc.Auctioneer == session.Username);
 
-            _auctions.Update(auction.Id, auction);
-            return Ok();
+                if (ModelState.IsValid)
+                {
+                    if (auction.Item.ImageFiles != null)
+                    {
+                        foreach (var file in auction.Item.ImageFiles)
+                        {
+                            BinaryReader binaryReader = new BinaryReader(file.OpenReadStream());
+                            byte[] content = binaryReader.ReadBytes((int)file.Length);
+                            binaryReader.Close();
+
+                            auction.Item.Images.Add(new Image { Bytes = content, ContentType = file.ContentType });
+                        }
+                    }
+                    auction.Auctioneer = session.Username;
+                    _auctions.Insert(auction);
+                    return RedirectToAction("Create");
+                }
+                return View(auction);
+            }
+            return RedirectToAction("Index", "Home");
         }
     }
 }

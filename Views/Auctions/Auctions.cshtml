@@ -4,13 +4,14 @@
 
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
-@using static AuctionCore.Utils.StringExtensions; 
+@using static AuctionCore.Utils.StringExtensions;
 
 @{
     ViewData["Title"] = "Auctions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     string categoryValue = ViewContext.HttpContext.Request.Query["category"].ToString().ToLower();
+    string rangeValue = ViewContext.HttpContext.Request.Query["range"].ToString().ToLower();
     string searchValue = ViewContext.HttpContext.Request.Query["search"].ToString();
     string orderByValue = ViewContext.HttpContext.Request.Query["orderBy"].ToString();
     List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails> categories =
@@ -61,7 +62,7 @@
             <p id="priceRangeSelected"></p>
         </div>
 
-        @using (Html.BeginForm("Auctions", "Auctions", FormMethod.Get, new { @autocomplete = "off" }))
+        @using (Html.BeginForm("Auctions", "Auctions", FormMethod.Get, new { @id = "auctions-form", @autocomplete = "off", @spellcheck = "off" }))
         {
             <div id="top-search">
                 <div class="container">
@@ -69,7 +70,7 @@
                         <div class="col-lg-10">
                             <input type="text" name="category" id="category" hidden />
                             <input type="text" name="range" id="range" hidden />
-                            <input type="search" placeholder="Search" aria-label="Search" name="search" id="search" class="form-control" />
+                            <input type="search" placeholder="Search" aria-label="Search" name="search" id="search" class="form-control" spellcheck="false" />
                         </div>
 
                         <div class="col-lg-2 float-right">
@@ -123,21 +124,21 @@
 
         <div id="content-list">
 
-            @foreach (var entry in categories)
+            @foreach (var parent in categories)
             {
                 <div class="list-group">
 
-                    <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@entry.Name.StripNonLatin().ToLower()">
+                    <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@parent.Name.StripNonLatin().ToLower()">
                         <span class="fa fa-chevron-right float-left"></span>
-                        @entry.Name <span class="badge badge-pill badge-primary float-right">@entry.GetCount()</span>
+                        @parent.Name <span class="badge badge-pill badge-primary float-right">@parent.GetCount()</span>
                     </a>
 
                     <div class="list-group list-group-flush list-group-nested">
 
-                        @foreach (var sub in entry.Subs)
+                        @foreach (var child in parent.Subs)
                         {
-                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(entry.Name.StripNonLatin(), ".", sub.Name.StripNonLatin()).ToLower()">
-                                @sub.Name <span class="badge badge-pill badge-primary float-right">@sub.Count</span>
+                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(parent.Name.StripNonLatin().ToLower(), ".", child.Name.StripNonLatin()).ToLower()">
+                                @child.Name <span class="badge badge-pill badge-primary float-right">@child.Count</span>
                             </a>
                         }
                     </div>
@@ -145,54 +146,34 @@
             }
         </div>
 
-        <script>
-            var session =
-            @Json.Serialize(SessionService.Get(HttpContextAccessor.HttpContext.Request.Cookies["session:id"].ToString()));
-
-            var model =
-                @Json.Serialize(Model);
-
-        </script>
-
         <div id="content-table">
 
-            @if (Model != null)
+            @if (Model.Any())
             {
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             <th scope="col" class="noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("name", orderByValue == "name" || orderByValue == "name.asc" ? ".desc" : ".asc")">
-                                    Name
-                                </a>
+                                @Html.ActionLink("Name", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("name", orderByValue == "name" || orderByValue == "name.asc" ? ".desc" : ".asc") })
                             </th>
                             <th scope="col" class="noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("expires", orderByValue == "expires" || orderByValue == "expires.asc" ? ".desc" : ".asc")">
-                                    Expires
-                                </a>
+                                @Html.ActionLink("Expires", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("expires", orderByValue == "expires" || orderByValue == "expires.asc" ? ".desc" : ".asc") })
                             </th>
                             <th scope="col" class="init noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("startingprice", orderByValue == "startingprice" || orderByValue == "startingprice.asc" ? ".desc" : ".asc")">
-                                    Starting Price
-                                </a>
+                                @Html.ActionLink("Starting Price", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("startingprice", orderByValue == "startingprice" || orderByValue == "startingprice.asc" ? ".desc" : ".asc") })
                             </th>
                             <th scope="col" class="min noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("currentbid", orderByValue == "currentbid" || orderByValue == "currentbid.asc" ? ".desc" : ".asc")">
-                                    Current Bid
-                                </a>
+                                @Html.ActionLink("Current Bid", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("currentbid", orderByValue == "currentbid" || orderByValue == "currentbid.asc" ? ".desc" : ".asc") })
                             </th>
                             <th scope="col" class="max noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("buyoutprice", orderByValue == "buyoutprice" || orderByValue == "buyoutprice.asc" ? ".desc" : ".asc")">
-                                    Buyout Price
-                                </a>
+                                @Html.ActionLink("Buyout Price", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("buyoutprice", orderByValue == "buyoutprice" || orderByValue == "buyoutprice.asc" ? ".desc" : ".asc") })
                             </th>
                             <th scope="col" class="noselect">
-                                <a href="Auctions?category=@categoryValue&search=@searchValue&orderBy=@string.Concat("soldby", orderByValue == "soldby" || orderByValue == "soldby.asc" ? ".desc" : ".asc")">
-                                    Sold By
-                                </a>
+                                @Html.ActionLink("Sold By", "Auctions", new { category = categoryValue, range = rangeValue, search = searchValue, orderBy = string.Concat("soldby", orderByValue == "soldby" || orderByValue == "soldby.asc" ? ".desc" : ".asc") })
                             </th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach (var auction in Model)
                         {
@@ -203,10 +184,20 @@
                                 <td class="min">@string.Concat(auction.Bids.Max(bid => (decimal?)bid.Amount), auction.Bids.Any() ? " " + auction.Currency : "")</td>
                                 <td class="max">@string.Concat(auction.BuyoutPrice, auction.BuyoutPrice != null ? " " + auction.Currency : "")</td>
                                 <td>@auction.Auctioneer</td>
+                                <!--
+                                <td>@string.Format("{0}", auction.BuyoutPrice != null ? string.Concat(auction.BuyoutPrice, " ", auction.Currency) : null)</td>
+                                    @string.Format("{0}", auction.BuyoutPrice != null ? string.Format("{0} {1}", auction.BuyoutPrice, auction.Currency) : null)
+                                 -->
                             </tr>
                         }
                     </tbody>
                 </table>
+            }
+            else
+            {
+                <div id="model-empty">
+                    <h3 class="font-weight-bold">No Auctions Found!</h3>
+                </div>
             }
         </div> <!-- end of content-table -->
     </div> <!-- end of content-wrapper -->
@@ -223,18 +214,8 @@
                     <div id="modal-body-wrapper">
                         <div class="modal-flex-content">
                             <div id="carousel" class="carousel slide" data-ride="carousel">
-                                <ol class="carousel-indicators">
-                                    <!--
-                                    <li data-target="#carousel" data-slide-to="0" class="active"></li>
-                                    -->
-                                </ol>
-                                <div class="carousel-inner">
-                                    <!--
-                                    <div class="carousel-item active">
-                                        <img class="d-block w-100" src="~/images/no-image.jpg" width="250" height="200" alt="First slide" />
-                                    </div>
-                                        -->
-                                </div>
+                                <ol class="carousel-indicators"></ol>
+                                <div class="carousel-inner"></div>
                                 <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="sr-only">Previous</span>
@@ -247,11 +228,11 @@
                         </div>
 
                         <div class="modal-flex-content">
-                            <p id="name">AuctionName</p>
+                            <p id="name"></p>
                         </div>
 
                         <div class="modal-flex-content">
-                            <p id="description">Description</p>
+                            <p id="description"></p>
                         </div>
 
                     </div>
@@ -267,5 +248,12 @@
             <input type="button" value="Buy" class="btn btn-primary btn-outline-dark" />
         </div> <!-- end of bottom-content -->
     </div> <!-- end of bottom-wrapper -->
+</div> <!-- end of body-wrapper -->
 
-</div> <!-- end of body-wrapper --> 
+
+<script>
+    var session =
+        @Json.Serialize(SessionService.Get(HttpContextAccessor.HttpContext.Request.Cookies["session:id"].ToString()));
+    var model =
+        @Json.Serialize(Model.Select(auc => new { auc.Id, auc.Item.Name, auc.Item.Description, auc.Item.Images }));
+</script>

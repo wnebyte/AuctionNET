@@ -13,13 +13,13 @@
 
 :root {
     --background: rgba(0, 0, 0, 0.9);
-    --backgroud-light: rgba(0, 0, 0, 0.7); 
+    --backgroud-light: rgba(0, 0, 0, 0.7);
     --primary-color: #000;
-    --secondary-color: rgb(43, 1, 18); /* gb(43, 0, 0) */
+    --secondary-color: rgb(7, 11, 27); /* rgb(14, 22, 53) */ /* rgb(43, 0, 0) */
     --tertiary-color: rgb(43, 1, 18);
     --quarternary-color: rgb(66, 139, 202);
     --content-list-active-color: var(--secondary-color);
-    --content-table-active-color: rgba(43, 1, 18, 0.7);
+    --content-table-active-color: rgba(7, 11, 27, 0.4);
 }
 
 
@@ -134,7 +134,7 @@ body {
 
     #content-wrapper ::-webkit-scrollbar-track {
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        background-color: #000;
+        background-color: var(--secondary-color);
     }
 
     #content-wrapper ::-webkit-scrollbar {
@@ -144,7 +144,7 @@ body {
     }
 
     #content-wrapper ::-webkit-scrollbar-corner {
-        background-color: #000;
+        background-color: var(--secondary-color);
     }
 
     #content-wrapper ::-webkit-scrollbar-thumb {
@@ -171,6 +171,7 @@ body {
         border: 3px solid;
         border-color: var(--secondary-color);
         color: white;
+        border-right: none;
     }
 
     /* only the outer list-items */
@@ -238,11 +239,11 @@ body {
     }
 
         #content-table > table > thead {
-            background-color: var(--tertiary-color); 
+            background-color: var(--secondary-color); 
         }
 
             #content-table > table > thead > tr > th {
-                border-color: var(--tertiary-color);
+                border-color: var(--secondary-color);
             }
 
     #content-table > table > thead > tr > th > a {
@@ -260,6 +261,24 @@ body {
     #content-table .table-active {
         background: var(--content-table-active-color);
     }
+
+    #content-table #model-empty {
+        background-color: inherit;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: table;
+        transform: rotate(315deg); 
+    }
+
+        #content-table #model-empty h3 {
+            font-size: 2.2em;
+            color: white;
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+        }
 
 #auctions-modal {
     background-color: rgba(0, 0, 0, 0.5) !important;

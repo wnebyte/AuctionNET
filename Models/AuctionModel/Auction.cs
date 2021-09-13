@@ -19,29 +19,30 @@ namespace AuctionCore.Models.AuctionModel
         public Item Item { get; set; }
 
         [Required]
-        [Range(0.1, double.MaxValue, ErrorMessage = "Minimum bid must be greater than or equal to 0.1 UNIT")]
-        [Display(Name = "Minimum Bid"), DataType(DataType.Currency)]
+        [Range(1.0, double.MaxValue, ErrorMessage = "The Auction's starting price must be greater than or equal to 1.0 [auction's currency].")]
+        [Display(Name = "Auction's starting price"), DataType(DataType.Currency)]
         [BsonRequired]
         [BsonElement(elementName: "startingPrice"), BsonRepresentation(BsonType.Decimal128)]
         public decimal StartingPrice { get; set; }
 
         [AssertThat("BuyoutPrice > StartingPrice", 
-            ErrorMessage = "The buyout price if specified must be greater than the minimum bid")]
-        [Display(Name = "Buyout Price"), DataType(DataType.Currency)]
+            ErrorMessage = "The Auction's buyout price if assigned, must be greater than the starting price.")]
+        [Display(Name = "Auction's buyout price"), DataType(DataType.Currency)]
         [BsonDefaultValue(null), BsonIgnoreIfDefault]
         [BsonElement(elementName: "buyoutPrice"), BsonRepresentation(BsonType.Decimal128)]
         public decimal? BuyoutPrice { get; set; }
 
-        [BsonRequired]  
-        [BsonRepresentation(BsonType.DateTime), BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [BsonRequired]
+        [BsonRepresentation(BsonType.DateTime), BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         [BsonElement(elementName: "posted")]
-        public DateTime Posted { get; set; } = DateTime.Now;
+        public DateTime Posted { get; set; } = DateTime.UtcNow;
 
         [BsonRequired]
-        [BsonRepresentation(BsonType.DateTime), BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [BsonRepresentation(BsonType.DateTime), BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         [BsonElement(elementName: "expires")]
-        public DateTime Expires { get; set; }
+        public DateTime Expires { get; set; } = DateTime.UtcNow.AddDays(30);
 
+        [Display(Name = "Auctioneer")]
         [BsonRequired]
         [BsonElement(elementName: "auctioneer")]
         public string Auctioneer { get; set; }
@@ -52,18 +53,19 @@ namespace AuctionCore.Models.AuctionModel
 
         [BsonRequired]
         [BsonElement(elementName: "schemaVersion")]
-        public string SchemaVersion { set;  get; } = "1.0.0";
+        public string SchemaVersion { get; set; } = "1.0.0";
 
+        [Required]
+        [Display(Name = "Auction's currency")]
         [BsonRequired]
         [BsonElement(elementName: "currency")]
-        public string Currency { get; set; } = "SEK"; 
+        public string Currency { get; set; }
 
-        public override string ToString()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
+        public override string ToString() =>
+            JsonConvert.SerializeObject(this, Formatting.Indented);
 
         public string ToJSON() =>
             ToString();
+
     }
 }

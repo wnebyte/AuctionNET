@@ -11,13 +11,13 @@ namespace AuctionCore.Models.AuctionModel
     public class Category
     {
         [Required]
-        [Display(Name = "Main Category")]
+        [Display(Name = "Auction's main category")]
         [BsonRequired]
         [BsonElement(elementName: "main")]
         public string Main { get; set; }
 
         [Required]
-        [Display(Name = "Sub Category")]
+        [Display(Name = "Auction's sub category")]
         [BsonRequired]
         [BsonElement(elementName: "sub")]
         public string Sub { get; set; }

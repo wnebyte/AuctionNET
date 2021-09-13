@@ -1,22 +1,23 @@
-﻿// static variables
+﻿// global variables
 let state = {
     "toggled": [],
     "selected": ""
 };
 
-var DELAY = 225, clicks = 0, timer_list = null, timer_table = null;
-const WAIT = 750;
+// delay = 225
+var DELAY = 500, clicks = 0, timer_list = null, timer_table = null;
+//wait = 750
+const WAIT = 10000;
 
-const trActive  = 'table-active';
-const trSuccess = 'bg-success'; 
-const trWarning = 'bg-warning'; 
-const trDanger  = 'bg-danger'; 
-const tdWarning = 'bg-warning'; 
-const borderDanger = 'border-danger'; 
+const tr_active  = 'table-active', tr_success = 'bg-success', tr_warning = 'bg-warning', tr_danger  = 'bg-danger'; 
+const td_warning = 'bg-warning', border_danger = 'border-danger'; 
 
 // on ready function
 $(function () {
 
+    /**
+     * <summary> click handler on sessionBtn : event ajax post to server
+     **/
     $('#sessionBtn').click(function () {
         postAsyncSession(state, function (result) {
             if (result.status != 'success') {
@@ -25,7 +26,10 @@ $(function () {
         });
     });
 
-    // init #content-list
+    /**
+     * init #content-list
+     * <summary> click handler on list-group-item-action : event (click -> toggle a background) | (dblclick -> toggle nested list-group)
+     **/
     $('.list-group-item-action').on('click', function () {
         clicks++;
         var node = $(this).blur();
@@ -70,7 +74,10 @@ $(function () {
         }
     }
 
-    // init #content-table
+    /**
+     * init #content-table
+     * <summary> click handler on the table > tr : (click -> toggle tr background) | (dblclick -> build and show modal)
+     **/
     $('#content-table > table > tbody > tr').on('click', function () {
         clicks++;
         var node = $(this); 
@@ -91,24 +98,23 @@ $(function () {
             e.preventDefault();
         });
 
+    /**
+     * <summary> click handler on the bid button : event (validate -> ajax post to server) -> display the results. 
+     **/
     $('input[value="Bid"]').click(function () {
-        var node = $('.' + trActive);
+        var node = $('.' + tr_active);
         if (node.length != 1) return false;
-
-        let bid = {
-            'id': node.attr('id'),
-            'val': $('input[type="number"]').val()
-        };
+        let bid = { 'id': node.attr('id'), 'val': $('input[type="number"]').val() };
 
         if (validates(bid)) {
             postAsyncBid(bid, function (result) {
                 if (result.status == 'success') {
-                    node.toggleClass(trActive).toggleClass(trSuccess);
+                    node.toggleClass(tr_active).toggleClass(tr_success);
                     $('.min', node).html(null)
                         .append('<span class="fa fa-thumbs-up" style="text-align: center; display: block; margin: auto;"></span');
                     setTimeout(function () {
                         $('.min', node).html(maxBid(result.data));
-                        node.toggleClass(trSuccess);
+                        node.toggleClass(tr_success);
                     }, WAIT);
                 }
                 else {
@@ -118,15 +124,18 @@ $(function () {
             });
         }
     });
- 
+
+    /**
+     * <summary> click handler on the buy button : event ajax post to server -> display the results. 
+     **/
     $('input[value="Buy"]').click(function () {
-        var node = $('.' + trActive);
+        var node = $('.' + tr_active);
         if (node.length != 1) return false;
 
         if ($('.max', node).html() != '') {
             postAsyncBuyout({ 'id': node.attr('id') }, function (result) {
                 if (result.status == 'success') {
-                    node.toggleClass(trActive).toggleClass(trSuccess);
+                    node.toggleClass(tr_active).toggleClass(tr_success);
                     $('.max', node).html(null)
                         .append('<span class="fa fa-thumbs-up" style="text-align: center; display: block; margin: auto;"></span');
                     setTimeout(function () {
@@ -152,6 +161,9 @@ $(function () {
     var to = values.indexOf(400);
     var range = $('#range');
 
+    /**
+     * <summary> instantiates the range-slider, with the values declared above. 
+     **/
     $('#range-slider').ionRangeSlider({
         type: 'double', 
         skin: 'big', 
@@ -165,25 +177,40 @@ $(function () {
         postfix: ' SEK', 
         force_edges: true, 
         onFinish: function (data) {
-            range.val(values[data.from] + "," + values[data.to]);
+            range.val(values[data.from] + "-" + values[data.to]);
+
         }, 
         onUpdate: function (data) {
             if (disabled)
                 range.val(null);
             else
-                range.val(values[data.from] + "," + values[data.to]);
+                range.val(values[data.from] + "-" + values[data.to]);
         }
     });
 
+    /**
+     * <summary> click handler on the range slider toggle button : event toggles the range-slider and its radio inputs. 
+     **/
     $('.slider').click(function () {
         instance = $('#range-slider').data('ionRangeSlider'); 
         disabled = !disabled;
         instance.update({
             disable: disabled
         });
-
         $('#range-selector input[type="radio"]').attr('disabled', disabled)
             .siblings('label').toggleClass('opacity');
+    });
+
+    /**
+     * <summary> removes the optional parameters from the url before submit. 
+     **/
+    $('#auctions-form').submit(function () {
+        $('#search, #category, #range').each(function () { if (!$(this).val()) $(this).remove(); });
+        if (range != undefined && !disabled) {
+            range.val($('#range-selector input[type="radio"]:checked').siblings('label').html().replace(/\s/g, '').toLowerCase()
+                .concat('-').concat(range.val()));
+        } 
+        return true;
     });
 
 });
@@ -212,41 +239,65 @@ function dblclick_list(node) {
     }
 }
 
+// #content-table click event
 function click_table(node) {
-    $('#content-table > table > tbody > tr').not(node).removeClass(trActive);
-    node.toggleClass(trActive);
+    $('#content-table > table > tbody > tr').not(node).removeClass(tr_active);
+    node.toggleClass(tr_active);
 }
 
+// #content-table dblclick event
 function dblclick_table(node) {
     var modal = $('#auctions-modal');
-    var model = getModel(node.attr('id'));
-    var images = model.Item.Images;
+    var indicators = $('.carousel-indicators', modal);
+    var inner = $('.carousel-inner', modal);
+    var obj = model.find(auc => auc.Id == node.attr('id'));
 
-    if (images.length == 0)
-        buildDefaultCarousel();
-    else 
-        buildCustomCarousel(images);
+    indicators.children('li').remove();
+    inner.children('.carousel-item').remove();
 
-    $('#name', modal).html(model.Item.Name);
-    $('#description', modal).html(model.Item.Description);
+    if (obj.Images.length == 0) {
+        indicators.append('<li data-target="#carousel" data-slide-to="0" class="active"></li>');
+        inner.append('<div class="carousel-item active">' + generateImage(true) + '</div>');
+    }
+    else {
+        let i = 0;
+        Array.from(obj.Images).forEach((img) => {
+            indicators.append('<li data-target="#carousel" data-slide-to="' + i++ + '"></li>');
+            inner.append('<div class="carousel-item">' + generateImage(false, img) + '</div>');
+        });
+        indicators.children('li:first-of-type').addClass('active');
+        inner.children('.carousel-item:first-of-type').addClass('active');
+    }
+
+    $('#name', modal).html(obj.Name);
+    $('#description', modal).html(obj.Description);
     modal.show();
+}
+
+function generateImage(def, image) {
+    if (def) {
+        return '<img class="d-block w-100" src="../images/no-image.jpg" width="250" height="200"/>';
+    }
+    else {
+        return '<img class="d-block w-100" src="data:' + image.ContentType + ';base64,' + image.Bytes + '" width="250" height="200"/>'
+    }
 }
 
 // error handler for #content-table's buy/buyout buttons
 function errorHandler(statusCode, parent, child, data) {
 
     if (statusCode == 400) {
-        parent.toggleClass(trActive).toggleClass(trDanger);
+        parent.toggleClass(tr_active).toggleClass(tr_danger);
         child.html(null)
             .append('<span class="fa fa-thumbs-down" style="text-align: center; display: block; margin: auto;"></span');
         setTimeout(function () {
             child.html(maxBid(data));
-            parent.toggleClass(trDanger);
+            parent.toggleClass(tr_danger);
         }, WAIT);
     }
 
     if (statusCode == 404) {
-        parent.toggleClass(trActive).toggleClass(trDanger);
+        parent.toggleClass(tr_active).toggleClass(tr_danger);
         child.html(null)
             .append('<span class="fa fa-thumbs-down" style="text-align: center; display: block; margin: auto;"></span');
         setTimeout(function () {
@@ -256,9 +307,9 @@ function errorHandler(statusCode, parent, child, data) {
 
     if (statusCode == 408) {
         $('#modalBtn').click();
-        var modal = $('.modal-content').toggleClass(borderDanger);
+        var modal = $('.modal-content').toggleClass(border_danger);
         setTimeout(function () {
-            modal.toggleClass(borderDanger);
+            modal.toggleClass(border_danger);
         }, WAIT);
     }
 
@@ -273,8 +324,8 @@ function validates(bid) {
     var init, min, max = null; 
     const del = ' '; 
     var val = true; 
-    var initWarn, minWarn, maxWarn = false; 
-    const warnClass = 'border-warning'; 
+    var init_warn, min_warn, max_warn = false; 
+    const warn_class = 'border-warning'; 
 
     try {
         var theader = $('#content-table > table > thead > tr');
@@ -300,35 +351,35 @@ function validates(bid) {
 
         if (init != null) {
             if (bid < init) {
-                initWarn = true;
+                init_warn = true;
                 val = false;
             }
         }
 
         if (min != null) {
             if (bid <= min) {
-                minWarn = true;
+                min_warn = true;
                 val = false;
             }
         }
 
         if (max != null) {
             if (max <= bid) {
-                maxWarn = true;
+                max_warn = true;
                 val = false;
             }
 
         }
 
-        if (initWarn || minWarn || maxWarn) {
-            if (initWarn) theader.children('.init').toggleClass(warnClass);
-            if (minWarn) theader.children('.min').toggleClass(warnClass);
-            if (maxWarn) theader.children('.max').toggleClass(warnClass);
+        if (init_warn || min_warn || max_warn) {
+            if (init_warn) theader.children('.init').toggleClass(warn_class);
+            if (min_warn) theader.children('.min').toggleClass(warn_class);
+            if (max_warn) theader.children('.max').toggleClass(warn_class);
 
             setTimeout(function () {
-                if (initWarn) theader.children('.init').toggleClass(warnClass);
-                if (minWarn) theader.children('.min').toggleClass(warnClass);
-                if (maxWarn) theader.children('.max').toggleClass(warnClass);
+                if (init_warn) theader.children('.init').toggleClass(warn_class);
+                if (min_warn) theader.children('.min').toggleClass(warn_class);
+                if (max_warn) theader.children('.max').toggleClass(warn_class);
             }, WAIT);
         }
     }
@@ -340,42 +391,4 @@ function validates(bid) {
 
 function maxBid(data) {
     return Math.max.apply(Math, data.Bids.map(function (o) { return o.Amount; })) + ' ' + data.Currency;
-}
-
-function getModel(id) {
-    for (i = 0; i < model.length; i++) {
-        if (model[i].Id == id) {
-            return model[i];
-        }
-    }
-    return null;
-}
-
-function buildDefaultCarousel() {
-    var indicators = $('.carousel-indicators');
-    indicators.children('li').remove();
-    indiactors.append('<li data-target="#carousel" data-slide-to="0" class="active"></li>');
-
-    var inner = $('.carousel-inner');
-    inner.children('.carousel-item').remove();
-    inner.append('<div class="carousel-item active"><img class="d-block w-100" src="~/images/no-image.jpg" width="250" height="200" alt="First slide"/></div>');
-}
-
-function buildCustomCarousel(images) {
-    var indicators = $('.carousel-indicators');
-    indicators.children('li').remove();
-
-    var inner = $('.carousel-inner');
-    inner.children('.carousel-item').remove();
-
-    for (i = 0; i < images.length; i++) {
-        indicators
-            .append('<li data-target="#carousel" data-slide-to="' + i + '"></li>');
-        inner
-            .append('<div class="carousel-item">' +
-                '<img class="d-block w-100" src="data:' + images[i].ContentType + ';base64,' + images[i].Bytes + '" width="250" height="200"/>' +
-                '</div>');
-    }
-    indicators.children('li:first-of-type').addClass('active');
-    inner.children('.carousel-item:first-of-type').addClass('active');
 }

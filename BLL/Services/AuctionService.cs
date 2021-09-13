@@ -14,11 +14,11 @@ namespace AuctionCore.BLL.Services
         public AuctionService() =>
             _repo = new AuctionRepository();
 
-        public void Create(Auction auction) =>
-            _repo.Create(auction);
+        public void Insert(Auction auction) =>
+            _repo.Insert(auction);
 
         public List<Auction> Get() =>
-            _repo.Get().FindAll(auction => auction.Expires > DateTime.UtcNow && auction.Bids.Find(b => b.IsBuyout) == null);
+            _repo.Get().FindAll(auction => auction.Expires > DateTime.UtcNow && !auction.Bids.Exists(bid => bid.IsBuyout));
 
         public Auction Get(string id)
         {

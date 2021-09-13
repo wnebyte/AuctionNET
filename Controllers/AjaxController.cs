@@ -35,7 +35,7 @@ namespace AuctionCore.Controllers
                 {
                     if (_auctions.Exists(asyncBid.Id, out Auction auction))
                     {
-                        if (auction.Bids.Max(b => b.Amount) < new decimal(asyncBid.Val))
+                        if (!auction.Bids.Any() || auction.Bids.Max(b => b.Amount) < new decimal(asyncBid.Val))
                         {
                             auction.Bids.Add(new Bid
                             {
@@ -82,7 +82,8 @@ namespace AuctionCore.Controllers
                             IsBuyout = true
                         });
 
-                        _auctions.Update(auction.Id, auction);
+                        //test
+                     //   _auctions.Update(auction.Id, auction);
 
                         return Content(new ResponseAsyncBuyout { Status = "success", StatusCode = 200 }
                         .ToJSON());
@@ -117,7 +118,6 @@ namespace AuctionCore.Controllers
 
                 return Ok();
             }
-
             return StatusCode(412);
         }
 
@@ -156,6 +156,23 @@ namespace AuctionCore.Controllers
             }
 
             return StatusCode(412);
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost("/Ajax/Delete")]
+        public IActionResult Delete([FromBody] AsyncDelete asyncDelete)
+        {
+            /*
+            if (_sessions.Exists(this.HttpContext, "session:id", out var session) && session.Username != null)
+            {
+                var auction = _auctions.Get().Find(auc => auc.Auctioneer == session.Username && auc.Id == id);
+                _auctions.Delete(auction);
+
+                return Content(new Response { Status = "success", StatusCode = 200 }.ToJSON());
+            }
+            return Content(new Response { Status = "error", StatusCode = 412 }.ToJSON());
+            */
+            return Content(new Response { Status = asyncDelete.Id, StatusCode = 1 }.ToJSON());
         }
     }
 }

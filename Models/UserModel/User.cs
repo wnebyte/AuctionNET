@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AuctionCore.Models.BankCardModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -53,8 +52,5 @@ namespace AuctionCore.Models.UserModel
         [BsonRequired]
         [BsonElement(elementName: "address")]
         public Address Address { get; set; }
-
-        [BsonIgnore]
-        public List<BankCard> BankCards { get; set; }
     }
 }

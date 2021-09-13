@@ -1,0 +1,23 @@
+_id, 
+item {
+	name, 
+	category {
+		main, 
+		sub
+	}, 
+	description, 
+	keywords [], 
+	images {
+		bytes [], 
+		contentType, 
+		size
+	}
+}, 
+startingPrice (NumberDecimal("")), 
+buyoutPrice  (NumberDecimal("")), 
+posted (new Date("")), 
+expires (new Date("")), 
+auctioneer, 
+bids [{}], 
+currency, 
+schemaVersion

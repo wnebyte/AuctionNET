@@ -92,35 +92,6 @@ function postAsyncSession(state, callback) {
     });
 }
 
-// #content-table btn click event
-/*
-function postAsyncBid(bid, callback) {
-    var result = { status: null, statusCode: null, data: null };
-
-    $.post({
-        url: "/Ajax/Bid",
-        contentType: "application/json; charset=utf8",
-        data: JSON.stringify(bid),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("XSRF-TOKEN",
-                $('input:hidden[name="__RequestVerificationToken"]').val());
-        },
-        dataType: "json",
-        error: function (xhr) {
-            result.status = 'error'; 
-            result.statusCode = xhr.status;
-        }, 
-        success: function (data) {
-            result.status = 'success'; 
-            result.statusCode = 200; 
-            result.data = data; 
-        }
-    }).always(function () {
-        callback(result);
-    });
-}
-*/
-
 function postAsyncBid(bid, callback) {
     var result = { status: null, statusCode: null, data: null };
 
@@ -170,4 +141,30 @@ function postAsyncBuyout(buyout, callback) {
     }).always(function () {
         callback(result);
     });
+}
+
+function postAsyncDelete(id, callback) {
+    var result = { status: null, statusCode: null };
+
+    $.post({
+        url: '/Ajax/Delete', 
+        contentType: "application/json; charset=utf8",
+        data: json.stringify(id), 
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("XSRF-TOKEN",
+                $('input:hidden[name="__RequestVerificationToken"]').val());
+        },
+        dataType: 'json', 
+        error: function (xhr) {
+            result.status = 'http-error';
+            result.statusCode = xhr.status;
+        }, 
+        success: function (resp) {
+            result.status = resp.Status;
+            result.statusCode = resp.StatusCode;
+        }
+    })
+        .always(function () {
+            callback(result);
+        });
 }

@@ -61,15 +61,10 @@ body {
 
 
 body {
-    background-image: url(../images/AdobeStock_208568531.jpg);
-
+    background-image: url(../images/85802_download-dark-background-images-5561-1920x1200-px-high-resolution_1920x1200_h.jpg);
     background-position: center center;
-
     background-repeat: no-repeat;
-
     background-attachment: fixed;
-
     background-size: cover;
-
     background-color: rgba(204, 204, 204, 0.5);
 }
