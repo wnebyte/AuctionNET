@@ -1,18 +1,15 @@
-﻿using System;
+﻿using AuctionCore.Models.Auction;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using AuctionCore.Models.Auction;
 
-namespace AuctionCore.Data.Queries
+namespace AuctionCore.Utils.Extensions
 {
-    public static class AuctionQueries
+    public static class AuctionEnumerableExtensions
     {
-
-        public static List<Auction> OrderBy(List<Auction> auctions, string propertyName, bool ASC)
+        public static IEnumerable<Auction> MyOrderBy(
+            this IEnumerable<Auction> auctions, string propertyName, bool asc = true)
         {
-
-            if (ASC)
+            if (asc)
             {
                 switch (propertyName.ToLower())
                 {
@@ -51,12 +48,19 @@ namespace AuctionCore.Data.Queries
             return auctions;
         }
 
-        public static IEnumerable<Auction> SelectCategory(this IEnumerable<Auction> auctions, string category)
+        public static IEnumerable<Auction> MyRange(this List<Auction> auctions, double lower, double upper, string rangeBy)
         {
-            var query = from item in auctions
-                        where item.Item.Category.Main == category
-                        select item;
-            return query;
+            switch (rangeBy.ToLower())
+            {
+                case "startingprice":
+                    return auctions.FindAll(a => a.StartingPrice >= new decimal(lower) && a.StartingPrice <= new decimal(upper));
+                case "currentbid":
+                    return auctions.FindAll(a => a.Bids.Max(bid => (decimal?)bid.Amount) >= new decimal(lower) && a.Bids.Max(bid => (decimal?)bid.Amount) <= new decimal(upper));
+                case "buyoutprice":
+                    return auctions.FindAll(a => a.BuyoutPrice >= new decimal(lower) && a.BuyoutPrice <= new decimal(upper));
+            }
+
+            return auctions;
         }
     }
 }

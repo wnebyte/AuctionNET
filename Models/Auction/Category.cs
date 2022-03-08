@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.ComponentModel.DataAnnotations;
 
 namespace AuctionCore.Models.Auction
 {
@@ -13,13 +9,13 @@ namespace AuctionCore.Models.Auction
         [Required]
         [Display(Name = "Auction's main category")]
         [BsonRequired]
-        [BsonElement(elementName: "main")]
-        public string Main { get; set; }
+        [BsonElement(elementName: "primary")]
+        public string Primary { get; set; }
 
         [Required]
         [Display(Name = "Auction's sub category")]
         [BsonRequired]
-        [BsonElement(elementName: "sub")]
-        public string Sub { get; set; }
+        [BsonElement(elementName: "secondary")]
+        public string Secondary { get; set; }
     }
 }

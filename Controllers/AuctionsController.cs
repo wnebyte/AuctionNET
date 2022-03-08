@@ -35,14 +35,16 @@ namespace AuctionCore.Controllers
             {
                 string[] categories = category.ToLower().Split(".");
 
+                // only primary category has been specified
                 if (categories.Length == 1)
                 {
-                    auctions = auctions.FindAll(auc => auc.Item.Category.Main.ToLower().StripNonLatin() == categories[0]);
+                    auctions = auctions.FindAll(a => a.Item.Category.Primary.ToLower().StripNonLetters() == categories[0]);
                 }
+                // primary and secondary category has been specified
                 else if (categories.Length == 2)
                 {
-                    auctions = auctions.FindAll(auc => auc.Item.Category.Main.ToLower().StripNonLatin() == categories[0] && 
-                    auc.Item.Category.Sub.ToLower().StripNonLatin() == categories[1]);
+                    auctions = auctions.FindAll(a => a.Item.Category.Primary.ToLower().StripNonLetters() == categories[0] && 
+                    a.Item.Category.Secondary.ToLower().StripNonLetters() == categories[1]);
                 }
             }
 
@@ -112,10 +114,9 @@ namespace AuctionCore.Controllers
                         foreach (var file in auction.Item.ImageFiles)
                         {
                             BinaryReader binaryReader = new BinaryReader(file.OpenReadStream());
-                            byte[] content = binaryReader.ReadBytes((int)file.Length);
+                            byte[] data = binaryReader.ReadBytes((int)file.Length);
                             binaryReader.Close();
-
-                            auction.Item.Images.Add(new Image { Bytes = content, ContentType = file.ContentType });
+                            auction.Item.Images.Add(new Image { Data = data, ContentType = file.ContentType });
                         }
                     }
                     auction.Auctioneer = session.Username;

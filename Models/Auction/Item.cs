@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using AuctionCore.Utils.DataAnnotations;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +38,7 @@ namespace AuctionCore.Models.Auction
 
         [BsonIgnore]
         [DataType(DataType.Upload)]
-        [IFormFileExtensions(Extensions = ".jpg, .jpeg, .png", ErrorMessage = "Auction's images viable extensions include: jpeg, jpg, png.")]
+        [IFormFileExtensions(Extensions = ".jpg, .jpeg, .png", ErrorMessage = "Acceptable extensions for Auction images include: jpeg, jpg, png.")]
         [IFormFileCollectionMaxSize(MaxSize = 12 * 1024 * 1024)]
         public List<IFormFile> ImageFiles { get; set; }
 
