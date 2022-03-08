@@ -1,31 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using AuctionCore.Models.AuctionModel;
-using AuctionCore.BLL.Services;
+using AuctionCore.Models.Auction;
+using AuctionCore.Data.Services;
 using AuctionCore.Utils;
 using AuctionCore.Utils.Extensions;
-using System.IO;
 
 namespace AuctionCore.Controllers
 {
-    public class AuctionsController : BaseController
+    public class AuctionsController : Controller
     {
-        private readonly AuctionService _auctions;
-        private readonly SessionService _sessions;
-        private readonly CategoryDetailsService _categories;
+        private readonly IAuctionService _auctions;
 
-        public AuctionsController()
+        private readonly ICategoryService _categories;
+
+        private readonly ISessionService _sessions;
+
+        public AuctionsController(
+            IAuctionService auctions, ICategoryService categories, ISessionService sessions)
         {
-            _auctions = new AuctionService();
-            _sessions = new SessionService();
-            _categories = new CategoryDetailsService();
+            _auctions = auctions;
+            _categories = categories;
+            _sessions = sessions;
         }
 
         [HttpGet("/Auctions")]
-        public IActionResult Auctions(string category, string range, string search, string orderBy)
+        public IActionResult Auctions(
+            string category, string range, string search, string orderBy)
         {
-            List<Auction> auctions = _auctions.Get();
-            ViewData["categories"] = _categories.Get();
+            List<Auction> auctions = _auctions.GetAll();
+            ViewData["categories"] = _categories.GetAll();
 
             if (category != null)
             {
@@ -72,14 +76,13 @@ namespace AuctionCore.Controllers
             return View(auctions);
         }
 
-
         [HttpGet("/Create")]
         public IActionResult Create(string orderBy)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out var session) && session.Username != null)
+            if (_sessions.Exists(HttpContext, "session:id", out var session) && session.Username != null)
             {
-                ViewData["categories"] = _categories.Get();
-                ViewData["auctions"]   = _auctions.Get().FindAll(auc => auc.Auctioneer == session.Username);
+                ViewData["categories"] = _categories.GetAll();
+                ViewData["auctions"]   = _auctions.GetAll().FindAll(auc => auc.Auctioneer == session.Username);
 
                 if (orderBy != null)
                 {
@@ -97,10 +100,10 @@ namespace AuctionCore.Controllers
         [HttpPost("/Create")]
         public IActionResult Create(Auction auction)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out var session) && session.Username != null)
+            if (_sessions.Exists(HttpContext, "session:id", out var session) && session.Username != null)
             {
-                ViewData["categories"] = _categories.Get();
-                ViewData["auctions"]   = _auctions.Get().FindAll(auc => auc.Auctioneer == session.Username);
+                ViewData["categories"] = _categories.GetAll();
+                ViewData["auctions"]   = _auctions.GetAll().FindAll(auc => auc.Auctioneer == session.Username);
 
                 if (ModelState.IsValid)
                 {

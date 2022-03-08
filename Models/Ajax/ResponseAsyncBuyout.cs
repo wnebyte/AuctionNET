@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AuctionCore.Models.AuctionModel;
+using AuctionCore.Models.Auction;
 using Newtonsoft.Json;
 
 namespace AuctionCore.Models.Ajax

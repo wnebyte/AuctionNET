@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using AuctionCore.Models;
-using AuctionCore.Models.AuctionModel;
-using AuctionCore.BLL.Services;
-using AuctionCore.Utils;
 
 namespace AuctionCore.Controllers
 {
-    public class HomeController : BaseController
+    public class HomeController : Controller
     {
-
-        private readonly AuctionService service = new AuctionService();
-
         public IActionResult Index()
         {
             return View();

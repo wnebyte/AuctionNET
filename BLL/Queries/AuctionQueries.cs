@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AuctionCore.Models.AuctionModel;
+using AuctionCore.Models.Auction;
 
-namespace AuctionCore.BLL.Queries
+namespace AuctionCore.Data.Queries
 {
     public static class AuctionQueries
     {

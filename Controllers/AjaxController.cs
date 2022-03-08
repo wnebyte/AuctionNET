@@ -1,35 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using AuctionCore.Models;
-using AuctionCore.Models.UserModel;
-using AuctionCore.Models.AuctionModel;
+using AuctionCore.Models.Auction;
+using AuctionCore.Models.Session;
 using AuctionCore.Models.Ajax;
-using AuctionCore.BLL.Services;
-using Microsoft.AspNetCore.Http;
+using AuctionCore.Data.Services;
 
 namespace AuctionCore.Controllers
 {
     public class AjaxController : Controller
     {
-        private readonly SessionService _sessions;
-        private readonly UserService _users;
-        private readonly AuctionService _auctions;
+        private readonly ISessionService _sessions;
 
-        public AjaxController()
+        private readonly IUserService _users;
+
+        private readonly IAuctionService _auctions;
+
+        public AjaxController(
+            ISessionService sessions, IUserService users, IAuctionService auctions)
         {
-            _sessions = new SessionService();
-            _users = new UserService();
-            _auctions = new AuctionService();
+            _sessions = sessions;
+            _users = users;
+            _auctions = auctions;
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost("/Ajax/Bid")]
         public ActionResult Bid([FromBody] AsyncBid asyncBid)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
             {
                 if (session.Username != null)
                 {
@@ -43,7 +42,7 @@ namespace AuctionCore.Controllers
                                 Bidder = session.Username
                             });
 
-                            _auctions.Update(auction.Id, auction);
+                            _auctions.Update(auction);
 
                             return Content(new AsyncBidResponse { Status = "success", StatusCode = 200, Data = auction }
                             .ToJSON());
@@ -67,13 +66,13 @@ namespace AuctionCore.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost("/Ajax/Buyout")]
-        public ActionResult Buyout([FromBody] PostAsyncBuyout asyncBuyout)
+        public ActionResult Buyout([FromBody] PostAsyncBuyout buyout)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
             {
                 if (session.Username != null)
                 {
-                    if (_auctions.Exists(asyncBuyout.Id, out Auction auction))
+                    if (_auctions.Exists(buyout.Id, out Auction auction))
                     {
                         auction.Bids.Add(new Bid
                         {
@@ -104,9 +103,9 @@ namespace AuctionCore.Controllers
         [HttpPost("/Ajax/Login")]
         public ActionResult Login([FromBody] UserLogin userLogin)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
             {
-                var user = _users.Get().Find(u => u.EmailAddress == userLogin.EmailAddress);
+                var user = _users.GetAll().Find(u => u.EmailAddress == userLogin.EmailAddress);
 
                 if (user == null)
                     return StatusCode(417);
@@ -114,7 +113,7 @@ namespace AuctionCore.Controllers
                 if (userLogin.Password != user.Password)
                     return StatusCode(423);
 
-                _sessions.Set(session.SetUsername(user.Username));
+                _sessions.Update(session.SetUsername(user.Username));
 
                 return Ok();
             }
@@ -125,9 +124,9 @@ namespace AuctionCore.Controllers
         [HttpPost("/Ajax/Logout")]
         public ActionResult Logout()
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
             {
-                _sessions.Del(session.Key, "Username");
+                _sessions.Delete(session.Key, "Username");
                 return Ok();
             }
 
@@ -137,7 +136,7 @@ namespace AuctionCore.Controllers
         [HttpGet("/Ajax/GetSession")]
         public ActionResult GetSession()
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
                 return Content(session.ToJSON());
 
             return StatusCode(412);
@@ -145,13 +144,13 @@ namespace AuctionCore.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost("/Ajax/PostSession")]
-        public ActionResult PostSession([FromBody] PostAsyncSession asyncSession)
+        public ActionResult PostSession([FromBody] PostAsyncSession data)
         {
-            if (_sessions.Exists(this.HttpContext, "session:id", out Session session))
+            if (_sessions.Exists(HttpContext, "session:id", out Session session))
             {
-                session.Toggled = asyncSession.ToggledToString();
-                session.Selected = asyncSession.Selected;
-                _sessions.Set(session);
+                session.Toggled = data.ToggledToString();
+                session.Selected = data.Selected;
+                _sessions.Update(session);
                 return Ok();
             }
 

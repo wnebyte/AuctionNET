@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using AuctionCore.Models.UserModel;
-using AuctionCore.Models;
-using AuctionCore.BLL.Services;
-using AuctionCore.Utils;
+﻿using Microsoft.AspNetCore.Mvc;
+using AuctionCore.Models.User;
+using AuctionCore.Data.Services;
 
 namespace AuctionCore.Controllers
 {
-    public class AccountController : BaseController
+    public class AccountController : Controller
     {
 
-        private readonly UserService _users;
+        private readonly IUserService _users;
 
-        public AccountController() =>
-            _users = new UserService();
+        public AccountController(IUserService users)
+        {
+            _users = users;
+        }
 
 
         [HttpGet("/Account/Register")]

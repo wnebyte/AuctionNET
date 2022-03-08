@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<AuctionCore.Models.AuctionModel.Auction>
 
-@inject AuctionCore.BLL.Services.SessionService SessionService
+@inject AuctionCore.BLL.Services.ISessionService SessionService
 
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
@@ -14,8 +14,8 @@
     string rangeValue = ViewContext.HttpContext.Request.Query["range"].ToString().ToLower();
     string searchValue = ViewContext.HttpContext.Request.Query["search"].ToString();
     string orderByValue = ViewContext.HttpContext.Request.Query["orderBy"].ToString();
-    List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails> categories =
-        (List<AuctionCore.Models.CategoryDetailsModel.CategoryDetails>)ViewData["categories"];
+    List<AuctionCore.Models.Category.Category> categories =
+        (List<AuctionCore.Models.Category.Category>)ViewData["categories"];
 }
 
 <link rel="stylesheet" href="~/css/auctions.css" />
@@ -24,7 +24,6 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/js/auctions.js"></script>
 <script src="~/js/ajax.js"></script>
-
 
 <div id="body-wrapper">
 
@@ -54,7 +53,6 @@
         </label>
     </div>
 
-
     <div id="top-wrapper">
 
         <div id="top-slider">
@@ -62,7 +60,8 @@
             <p id="priceRangeSelected"></p>
         </div>
 
-        @using (Html.BeginForm("Auctions", "Auctions", FormMethod.Get, new { @id = "auctions-form", @autocomplete = "off", @spellcheck = "off" }))
+        @using (Html.BeginForm(
+             "Auctions", "Auctions", FormMethod.Get, new { @id = "auctions-form", @autocomplete = "off", @spellcheck = "off" }))
         {
             <div id="top-search">
                 <div class="container">
@@ -130,7 +129,7 @@
 
                     <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@parent.Name.StripNonLatin().ToLower()">
                         <span class="fa fa-chevron-right float-left"></span>
-                        @parent.Name <span class="badge badge-pill badge-primary float-right">@parent.GetCount()</span>
+                        @parent.Name <span class="badge badge-pill badge-primary float-right">@parent.Count()</span>
                     </a>
 
                     <div class="list-group list-group-flush list-group-nested">
@@ -250,10 +249,14 @@
     </div> <!-- end of bottom-wrapper -->
 </div> <!-- end of body-wrapper -->
 
-
 <script>
-    var session =
-        @Json.Serialize(SessionService.Get(HttpContextAccessor.HttpContext.Request.Cookies["session:id"].ToString()));
+
+    @if (@HttpContextAccessor.HttpContext.Request.Cookies.ContainsKey("session:id"))
+    {
+        var session =
+            @Json.Serialize(SessionService.Get(HttpContextAccessor.HttpContext.Request.Cookies["session:id"]));
+    }
     var model =
         @Json.Serialize(Model.Select(auc => new { auc.Id, auc.Item.Name, auc.Item.Description, auc.Item.Images }));
+
 </script>

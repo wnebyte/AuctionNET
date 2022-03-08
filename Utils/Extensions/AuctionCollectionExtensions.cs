@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AuctionCore.Models.AuctionModel;
+using AuctionCore.Models.Auction;
 using static AuctionCore.Utils.StringExtensions;
 
 namespace AuctionCore.Utils.Extensions

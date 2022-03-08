@@ -16,14 +16,16 @@ const td_warning = 'bg-warning', border_danger = 'border-danger';
 $(function () {
 
     /**
-     * <summary> click handler on sessionBtn : event ajax post to server
+     * <summary> updates the server-side session
      **/
     $('#sessionBtn').click(function () {
-        postAsyncSession(state, function (result) {
-            if (result.status != 'success') {
-                alert('postAsyncSession failed with statusCode ' + result.statusCode); 
-            }
-        });
+        if (session != null) {
+            postAsyncSession(state, function (result) {
+                if (result.status != 'success') {
+                    alert('postAsyncSession failed with statusCode ' + result.statusCode);
+                }
+            });
+        }
     });
 
     /**
