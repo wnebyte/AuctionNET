@@ -1,10 +1,10 @@
-﻿@model IEnumerable<AuctionCore.Models.AuctionModel.Auction>
+﻿@model IEnumerable<AuctionCore.Models.Auction.Auction>
 
-@inject AuctionCore.BLL.Services.ISessionService SessionService
+@inject AuctionCore.Data.Services.ISessionService SessionService
 
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
-@using static AuctionCore.Utils.StringExtensions;
+@using static AuctionCore.Utils.Extensions.StringExtensions;
 
 @{
     ViewData["Title"] = "Auctions";
@@ -127,7 +127,7 @@
             {
                 <div class="list-group">
 
-                    <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@parent.Name.StripNonLatin().ToLower()">
+                    <a href="#!" class="list-group-item list-group-item-action collapser noselect" id="@parent.Name.StripNonLetters().ToLower()">
                         <span class="fa fa-chevron-right float-left"></span>
                         @parent.Name <span class="badge badge-pill badge-primary float-right">@parent.Count()</span>
                     </a>
@@ -136,7 +136,7 @@
 
                         @foreach (var child in parent.Subs)
                         {
-                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(parent.Name.StripNonLatin().ToLower(), ".", child.Name.StripNonLatin()).ToLower()">
+                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(parent.Name.StripNonLetters().ToLower(), ".", child.Name.StripNonLetters()).ToLower()">
                                 @child.Name <span class="badge badge-pill badge-primary float-right">@child.Count</span>
                             </a>
                         }

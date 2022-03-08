@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuctionCore", "AuctionCore.csproj", "{3E97949B-3713-4C12-A262-1B7934CBDD2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "..\Models\Models.csproj", "{34B6283C-6C70-4E20-93B2-064343401F41}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{3E97949B-3713-4C12-A262-1B7934CBDD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E97949B-3713-4C12-A262-1B7934CBDD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E97949B-3713-4C12-A262-1B7934CBDD2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34B6283C-6C70-4E20-93B2-064343401F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34B6283C-6C70-4E20-93B2-064343401F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34B6283C-6C70-4E20-93B2-064343401F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34B6283C-6C70-4E20-93B2-064343401F41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

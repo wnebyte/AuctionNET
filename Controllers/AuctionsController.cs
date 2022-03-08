@@ -1,9 +1,11 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using AuctionCore.Models.Auction;
+using AuctionCore.Models.Session;
 using AuctionCore.Data.Services;
-using AuctionCore.Utils;
 using AuctionCore.Utils.Extensions;
 
 namespace AuctionCore.Controllers
@@ -59,7 +61,7 @@ namespace AuctionCore.Controllers
                     if (double.TryParse(split.Length == 2 ? split[0] : split[1], out double lower) &&
                         double.TryParse(split.Length == 2 ? split[1] : split[2], out double upper))
                     {
-                        auctions = auctions.MyRange(lower, upper, split.Length == 2 ? "startingprice" : split[0]);
+                        auctions = auctions.MyRange(lower, upper, split.Length == 2 ? "startingprice" : split[0]).ToList();
                     }
                 }
             }
@@ -72,7 +74,7 @@ namespace AuctionCore.Controllers
             if (orderBy != null)
             {
                 string[] order = orderBy.ToLower().Split(".");
-                auctions = auctions.MyOrderBy(order[0], order.Length == 2 && order[1] == "desc" ? false : true);
+                auctions = auctions.MyOrderBy(order[0], order.Length == 2 && order[1] == "desc" ? false : true).ToList();
             }
 
             return View(auctions);
@@ -81,7 +83,7 @@ namespace AuctionCore.Controllers
         [HttpGet("/Create")]
         public IActionResult Create(string orderBy)
         {
-            if (_sessions.Exists(HttpContext, "session:id", out var session) && session.Username != null)
+            if (_sessions.Exists(HttpContext, "session:id", out Session session) && session.Username != null)
             {
                 ViewData["categories"] = _categories.GetAll();
                 ViewData["auctions"]   = _auctions.GetAll().FindAll(auc => auc.Auctioneer == session.Username);
@@ -102,7 +104,7 @@ namespace AuctionCore.Controllers
         [HttpPost("/Create")]
         public IActionResult Create(Auction auction)
         {
-            if (_sessions.Exists(HttpContext, "session:id", out var session) && session.Username != null)
+            if (_sessions.Exists(HttpContext, "session:id", out Session session) && session.Username != null)
             {
                 ViewData["categories"] = _categories.GetAll();
                 ViewData["auctions"]   = _auctions.GetAll().FindAll(auc => auc.Auctioneer == session.Username);
@@ -111,9 +113,9 @@ namespace AuctionCore.Controllers
                 {
                     if (auction.Item.ImageFiles != null)
                     {
-                        foreach (var file in auction.Item.ImageFiles)
+                        foreach (IFormFile file in auction.Item.ImageFiles)
                         {
-                            BinaryReader binaryReader = new BinaryReader(file.OpenReadStream());
+                            var binaryReader = new BinaryReader(file.OpenReadStream());
                             byte[] data = binaryReader.ReadBytes((int)file.Length);
                             binaryReader.Close();
                             auction.Item.Images.Add(new Image { Data = data, ContentType = file.ContentType });

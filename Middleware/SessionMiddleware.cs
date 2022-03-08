@@ -1,7 +1,7 @@
-﻿using AuctionCore.Data.Services;
-using AuctionCore.Models;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+using AuctionCore.Models.Session;
+using AuctionCore.Data.Services;
 
 namespace AuctionCore.Middleware
 {
@@ -24,16 +24,32 @@ namespace AuctionCore.Middleware
 
                 if (service.Exists(cookie, out Session session))
                 {
-                    service.Update(UpdateSession(context, service, session));
+                    service.Update(
+						UpdateSession(
+							context, 
+							service, 
+							session)
+						);
                 }
                 else
                 {
-                    service.Update(UpdateSession(context, service, service.Insert(cookie)));
+                    service.Update(
+						UpdateSession(
+							context, 
+							service, 
+							service.Insert(cookie))
+						);
                 }
             }
             else
             {
-                cookie = service.Update(UpdateSession(context, service, service.Insert(Session.GenerateGUID()))).Key;
+                cookie = service.Update(
+                    UpdateSession(
+                        context, 
+                        service, 
+						service.Insert(Session.GenerateGUID()))
+                    ).Key;
+
                 context.Response.Cookies.Append("session:id", cookie);
             }
 

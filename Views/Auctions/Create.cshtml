@@ -1,4 +1,4 @@
-﻿@model AuctionCore.Models.AuctionModel.Auction
+﻿@model AuctionCore.Models.Auction.Auction
 
 @{
     ViewData["Title"] = "Create";
@@ -7,8 +7,8 @@
     List<AuctionCore.Models.Category.Category> categories =
         (List<AuctionCore.Models.Category.Category>)ViewData["categories"];
 
-    List<AuctionCore.Models.AuctionModel.Auction> auctions =
-        (List<AuctionCore.Models.AuctionModel.Auction>)ViewData["auctions"];
+    List<AuctionCore.Models.Auction.Auction> auctions =
+        (List<AuctionCore.Models.Auction.Auction>)ViewData["auctions"];
 
      string orderBy = ViewContext.HttpContext.Request.Query["orderBy"].ToString().ToLower();
 
@@ -66,8 +66,8 @@
                                 <div class="flex-container" style="display: flex; flex-direction: row; align-items: center;">
                                     <div style="margin-right: 5px;">
                                         <input id="category" type="text" class="form-control noselect" disabled />
-                                        <input asp-for="Item.Category.Main" id="categoryMain" class="form-control" hidden />
-                                        <input asp-for="Item.Category.Sub" id="categorySub" class="form-control" hidden />
+                                        <input asp-for="Item.Category.Primary" id="categoryMain" class="form-control" hidden />
+                                        <input asp-for="Item.Category.Secondary" id="categorySub" class="form-control" hidden />
                                     </div>
                                     <div class="btn-group dropright">
                                         <button id="categoryBtn" class="btn btn-primary dropdown-toggle dropdown-toggle-split" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -99,8 +99,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <span asp-validation-for="Item.Category.Main" class="text-danger"></span>
-                                        <span asp-validation-for="Item.Category.Sub" class="text-danger"></span>
+                                        <span asp-validation-for="Item.Category.Primary" class="text-danger"></span>
+                                        <span asp-validation-for="Item.Category.Secondary" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>

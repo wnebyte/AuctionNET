@@ -1,5 +1,5 @@
-﻿@using  AuctionCore.BLL.Services
-@inject AuctionCore.BLL.Services.ISessionService SessionService
+﻿@using  AuctionCore.Data.Services
+@inject AuctionCore.Data.Services.ISessionService SessionService
 
 @using  Microsoft.AspNetCore.Http
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
@@ -38,7 +38,6 @@
             @RenderBody()
         </main>
     </div>
-
 
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>

@@ -1,5 +1,5 @@
-﻿using AuctionCore.Middleware;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
+using AuctionCore.Middleware;
 
 namespace AuctionCore.Utils.Extensions
 {
