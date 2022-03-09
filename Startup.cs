@@ -67,7 +67,7 @@ namespace AuctionCore
 
             app.UseHttpsRedirection();
             app.UseMySession();
-            app.UseStaticFiles();
+			app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseMvc(routes =>
@@ -78,4 +78,20 @@ namespace AuctionCore
             });
         }
     }
+
+	public class Person
+	{
+		public string Id { get; set; } = Guid.NewGuid().ToString();
+
+		public string Name { get; set; }
+
+		public int Age { get; set; }
+
+		public override string ToString()
+		{
+			return string.Format(
+					"Id: %s, Name: %s, Age: %d", Id, Name, Age
+				);
+		}
+	}
 }

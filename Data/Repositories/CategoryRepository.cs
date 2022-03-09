@@ -13,12 +13,21 @@ namespace AuctionCore.Data.Repositories
         public CategoryRepository(ICategoryDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
+            IMongoDatabase database = client.GetDatabase(settings.DatabaseName);
             _collection = database.GetCollection<Category>(settings.CollectionName);
         }
 
         public List<Category> GetAll() =>
             _collection.Find(category => true).ToList();
 
-    }
+		public Category Get(string primary)
+		{
+			return _collection.Find(category => category.Name.Equals(primary))
+				.FirstOrDefault();
+		}
+
+		public void Update(Category category) => 
+			_collection.ReplaceOne(c => c.Id == category.Id, category);
+
+	}
 }

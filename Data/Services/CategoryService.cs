@@ -15,5 +15,21 @@ namespace AuctionCore.Data.Services
 
         public List<Category> GetAll() =>
             _repo.GetAll();
-    }
+
+		public void IncrementCount(string primary, string secondary)
+		{
+			Category category = _repo.Get(primary);
+
+			if (category != null)
+			{
+				SubCategory subCategory = category.Children.Find((c) => c.Name.Equals(secondary));
+
+				if (subCategory != null)
+				{
+					subCategory.Count++;
+					_repo.Update(category);
+				}
+			}
+		}
+	}
 }

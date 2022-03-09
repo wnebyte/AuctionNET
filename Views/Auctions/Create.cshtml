@@ -74,20 +74,20 @@
                                             <span class="sr-only">Toggle Dropright</span>
                                         </button>
                                         <div id="category-dropdown-menu" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            @foreach (var cat in categories)
+                                            @foreach (var parent in categories)
                                             {
                                                 <div class="list-group">
                                                     <a href="#!" class="list-group-item list-group-item-action collapser noselect">
                                                         <span class="fa fa-chevron-down float-left"></span>
-                                                        @cat.Name
+                                                        @parent.Name
                                                     </a>
 
                                                     <div class="list-group list-group-flush list-group-nested">
 
-                                                        @foreach (var sub in cat.Subs)
+                                                        @foreach (var child in parent.Children)
                                                         {
-                                                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(cat.Name, " | ", sub.Name)">
-                                                                @sub.Name
+                                                            <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(parent.Name, " | ", child.Name)">
+                                                                @child.Name
                                                             </a>
                                                         }
 

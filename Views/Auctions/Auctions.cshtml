@@ -134,7 +134,7 @@
 
                     <div class="list-group list-group-flush list-group-nested">
 
-                        @foreach (var child in parent.Subs)
+                        @foreach (var child in parent.Children)
                         {
                             <a href="#!" class="list-group-item list-group-item-action noselect" id="@string.Concat(parent.Name.StripNonLetters().ToLower(), ".", child.Name.StripNonLetters()).ToLower()">
                                 @child.Name <span class="badge badge-pill badge-primary float-right">@child.Count</span>

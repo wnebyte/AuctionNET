@@ -1,5 +1,5 @@
 ﻿// delay = 225
-var DELAY = 500, clicks = 0, timer_dropdown = null;
+var CLICK_DELAY = 500, clicks = 0, timer_dropdown = null;
 const WAIT = 750; 
 
 const tr_active = 'table-active', tr_success = 'bg-success'; 
@@ -26,7 +26,7 @@ $(function () {
                     $('#categoryBtn').dropdown('toggle');
                 }
                 clicks = 0;
-            }, DELAY);
+            }, CLICK_DELAY);
         }
         else {
             clearTimeout(timer_dropdown);
@@ -55,7 +55,7 @@ $(function () {
             timer_table = setTimeout(function () {
                 click_table(node);
                 clicks = 0;
-            }, DELAY);
+            }, CLICK_DELAY);
         }
         else {
             clearTimeout(timer_table);

@@ -16,11 +16,11 @@ namespace AuctionCore.Models.Category
         public string Name { get; set; }
 
         [BsonRequired]
-        [BsonElement(elementName: "subs")]
-        public List<SubCategory> Subs { get; set; }
+        [BsonElement(elementName: "children")]
+        public List<SubCategory> Children { get; set; }
 
         public int Count() =>
-            Subs.Sum(s => s.Count);
+            Children.Sum(s => s.Count);
     }
 
 }

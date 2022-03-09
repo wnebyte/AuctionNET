@@ -4,19 +4,17 @@ let state = {
     "selected": ""
 };
 
-// delay = 225
-var DELAY = 500, clicks = 0, timer_list = null, timer_table = null;
-//wait = 750
-const WAIT = 10000;
+var CLICK_DELAY = 500, clicks = 0, timer_list = null, timer_table = null;
+const WAIT = 750;
 
+// css classes
 const tr_active  = 'table-active', tr_success = 'bg-success', tr_warning = 'bg-warning', tr_danger  = 'bg-danger'; 
 const td_warning = 'bg-warning', border_danger = 'border-danger'; 
 
 // on ready function
 $(function () {
-
     /**
-     * <summary> updates the server-side session
+     * Makes an asynchronous post request to the server to update the session state.
      **/
     $('#sessionBtn').click(function () {
         if (session != null) {
@@ -29,37 +27,9 @@ $(function () {
     });
 
     /**
-     * init #content-list
-     * <summary> click handler on list-group-item-action : event (click -> toggle a background) | (dblclick -> toggle nested list-group)
-     **/
-    $('.list-group-item-action').on('click', function () {
-        clicks++;
-        var node = $(this).blur();
-
-        if (clicks == 1) {
-            if (node.parent().hasClass('list-group-nested')) {
-                click_list(node);
-                $('#sessionBtn').click();
-                clicks = 0;
-                return;
-            }
-            timer_list = setTimeout(function () {
-                click_list(node);
-                $('#sessionBtn').click();
-                clicks = 0;
-            }, DELAY);
-
-        } else {
-            clearTimeout(timer_list);
-            dblclick_list(node);
-            $('#sessionBtn').click();
-            clicks = 0;
-        }
-    })
-        .on('dbclick', function (e) {
-            e.preventDefault();
-        });
-
+    * Reads and applies any serialized session state.
+    **/
+    /*
     if (session != null) {
 
         if (session.Selected != null && session.Selected != '') {
@@ -70,25 +40,62 @@ $(function () {
             const data = session.Toggled.split(";");
 
             for (i = 0; i < data.length; i++) {
-                if (data[i] != null && data[i] != '')
+                if (data[i] != null && data[i] != '') {
                     dblclick_list($('#' + data[i]));
+                }
             }
         }
     }
+    */
 
     /**
-     * init #content-table
+     * Initializes the #content-list item click handler.
+     * When a single click is registered the item becomes selected. 
+     * When a double click is registered the nested list's visbility property (if the node has one) will 
+     * be toggled.
+     **/
+    $('.list-group-item-action').on('click', function () {
+        clicks++;
+        var node = $(this).blur();
+
+        if (clicks == 1) {
+            if (node.parent().hasClass('list-group-nested')) {
+                // node is a secondary category
+                click_list(node);
+                // $('#sessionBtn').click();
+                clicks = 0;
+            } else {
+                // node is a primary category
+                timer_list = setTimeout(function () {
+                    click_list(node);
+                    // $('#sessionBtn').click();
+                    clicks = 0;
+                }, CLICK_DELAY);
+            }
+        } else {
+            clearTimeout(timer_list);
+            dblclick_list(node);
+           // $('#sessionBtn').click();
+            clicks = 0;
+        }
+    })
+        .on('dbclick', function (e) {
+            e.preventDefault();
+        });
+
+    /**
+     * Initializes the #content-table click handler.
      * <summary> click handler on the table > tr : (click -> toggle tr background) | (dblclick -> build and show modal)
      **/
     $('#content-table > table > tbody > tr').on('click', function () {
         clicks++;
-        var node = $(this); 
+        var node = $(this);
 
         if (clicks == 1) {
             timer_table = setTimeout(function () {
                 click_table(node);
                 clicks = 0;
-            }, DELAY);
+            }, CLICK_DELAY);
         }
         else {
             clearTimeout(timer_table);
@@ -101,12 +108,17 @@ $(function () {
         });
 
     /**
-     * <summary> click handler on the bid button : event (validate -> ajax post to server) -> display the results. 
+     * <summary> click handler for the bid button : event (validate -> ajax post to server) -> display the results. 
      **/
     $('input[value="Bid"]').click(function () {
         var node = $('.' + tr_active);
-        if (node.length != 1) return false;
-        let bid = { 'id': node.attr('id'), 'val': $('input[type="number"]').val() };
+        if (node.length != 1) {
+            return false;
+        }
+        let bid = {
+            'id': node.attr('id'),
+            'val': $('input[type="number"]').val()
+        };
 
         if (validates(bid)) {
             postAsyncBid(bid, function (result) {
@@ -128,7 +140,7 @@ $(function () {
     });
 
     /**
-     * <summary> click handler on the buy button : event ajax post to server -> display the results. 
+     * <summary> click handler for the buy button : event ajax post to server -> display the results. 
      **/
     $('input[value="Buy"]').click(function () {
         var node = $('.' + tr_active);
@@ -155,7 +167,7 @@ $(function () {
         $(this).blur();
     });
 
-    // init #range_slider
+    // range-slider properties
     var instance; 
     var disabled = true;
     var values = [0, 50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, '&#8734;'];
@@ -164,7 +176,7 @@ $(function () {
     var range = $('#range');
 
     /**
-     * <summary> instantiates the range-slider, with the values declared above. 
+     * <summary> initializes the range-slider.
      **/
     $('#range-slider').ionRangeSlider({
         type: 'double', 
@@ -191,7 +203,7 @@ $(function () {
     });
 
     /**
-     * <summary> click handler on the range slider toggle button : event toggles the range-slider and its radio inputs. 
+     * <summary> toggle button click handler 
      **/
     $('.slider').click(function () {
         instance = $('#range-slider').data('ionRangeSlider'); 
@@ -207,24 +219,35 @@ $(function () {
      * <summary> removes the optional parameters from the url before submit. 
      **/
     $('#auctions-form').submit(function () {
-        $('#search, #category, #range').each(function () { if (!$(this).val()) $(this).remove(); });
+        $('#search, #category, #range').each(function () {
+            if (!$(this).val()) {
+                $(this).remove();
+            }
+        });
         if (range != undefined && !disabled) {
-            range.val($('#range-selector input[type="radio"]:checked').siblings('label').html().replace(/\s/g, '').toLowerCase()
-                .concat('-').concat(range.val()));
+            range.val($('#range-selector input[type="radio"]:checked')
+                .siblings('label')
+                .html()
+                .replace(/\s/g, '')
+                .toLowerCase()
+                .concat('-')
+                .concat(range.val()));
         } 
         return true;
     });
 
 });
 
-// #content-list click event
+// #content-list click handler
 function click_list(node) {
     $('.list-group-item-action').not(node).removeClass('active');
     node.toggleClass('active');
-    if (node.hasClass('active'))
+    if (node.hasClass('active')) {
         state.selected = $('#category').val(node.attr('id')).val();
-    else
+    }
+    else {
         state.selected = $('#category').val(null).val();
+    }
 }
 
 // #content-list dblclick event
@@ -234,10 +257,12 @@ function dblclick_list(node) {
         $('.svg-inline--fa', node)
             .toggleClass('fa-chevron-right')
             .toggleClass('fa-chevron-down');
-        if (!state.toggled.includes(node.attr('id')))
+        if (!state.toggled.includes(node.attr('id'))) {
             state.toggled.push(node.attr('id'))
-        else
-            state.toggled.splice(state.toggled.indexOf(node.attr('id')), 1); 
+        }
+        else {
+            state.toggled.splice(state.toggled.indexOf(node.attr('id')), 1);
+        }
     }
 }
 
@@ -281,7 +306,7 @@ function generateImage(def, image) {
         return '<img class="d-block w-100" src="../images/no-image.jpg" width="250" height="200"/>';
     }
     else {
-        return '<img class="d-block w-100" src="data:' + image.ContentType + ';base64,' + image.Bytes + '" width="250" height="200"/>'
+        return '<img class="d-block w-100" src="data:' + image.ContentType + ';base64,' + image.Data + '" width="250" height="200"/>'
     }
 }
 

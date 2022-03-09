@@ -58,18 +58,18 @@ namespace AuctionCore.Middleware
 
         private Session UpdateSession(HttpContext context, ISessionService service, Session session)
         {
-            session.Active += service.GetExpires() - service.GetTTL(session.Key);
+			session.Active += service.GetExpires() - service.GetTTL(session.Key);
 
-            if (session.CurrentPage != context.Request.Path.Value.ToString())
-            {
-                session.PrevPage = session.CurrentPage;
-            }
             if (context.Request.Method == HttpMethods.Get)
             {
-                session.CurrentPage = context.Request.Path.Value.ToString();
-            }
+				string path = context.Request.Path.Value;
 
-            session.Username = "wne";
+				if (session.CurrentPage != path)
+				{
+					session.PrevPage = session.CurrentPage;
+					session.CurrentPage = path;
+				}
+            }
 
             return session;
         }

@@ -6,5 +6,7 @@ namespace AuctionCore.Data.Services
     public interface ICategoryService
     {
         List<Category> GetAll();
+
+		void IncrementCount(string primary, string secondary);
     }
 }

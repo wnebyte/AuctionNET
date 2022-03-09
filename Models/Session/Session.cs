@@ -5,12 +5,10 @@ namespace AuctionCore.Models.Session
 {
     public class Session
     {
-        public static string GenerateGUID()
-        {
-            return "session:" + Guid.NewGuid().ToString();
-        }
+		public static string GenerateGUID() => 
+			"session:" + Guid.NewGuid().ToString();
 
-        public string Key { get; set; }
+		public string Key { get; set; }
 
         public string Username { get; set; }
 

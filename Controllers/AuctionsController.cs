@@ -123,6 +123,7 @@ namespace AuctionCore.Controllers
                     }
                     auction.Auctioneer = session.Username;
                     _auctions.Insert(auction);
+					_categories.IncrementCount(auction.Item.Category.Primary, auction.Item.Category.Secondary);
                     return RedirectToAction("Create");
                 }
                 return View(auction);
