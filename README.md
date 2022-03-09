@@ -1,5 +1,5 @@
 # AuctionNET
-.NET-application
+ASP.NET-application
 
 ## Table of Contents
 
